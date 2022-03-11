@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 1176ab3fc37bc2e47ae16aeda58ab2e9
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - wolfManager: {instanceID: 0}
+  - bushManager: {instanceID: 0}
+  - Home: {instanceID: 0}
+  - HumanRef: {fileID: 7338914621895843841, guid: 795264315fb7b134aaaec3f4173afb74, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
