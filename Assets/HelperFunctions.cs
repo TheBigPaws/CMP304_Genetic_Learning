@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum CurrentState { idle, goingToEnemy, storingFood, gatheringFood, eating, fighting, fleeing };
+public enum CurrentState { idle, goingToEnemy, storingFood, gatheringFood, eating, fighting, fleeing, hunting };
 
 
 

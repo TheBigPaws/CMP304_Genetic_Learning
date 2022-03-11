@@ -24,14 +24,13 @@ public class HumanScript : MonoBehaviour
 
     //behaviour variables
     public float actionTime;
-    //public bool finishedAction = false;
     public float hunger;
     public float eatingTriggerHungerFlat;
-    public float eatingTriggerHealthPercent;
     public GameObject targetObject;
     public float FoodInInventory;
     public CurrentState currentState = CurrentState.idle;
-    
+    public float fleeChance;
+    public float huntChance;
 
     void calculateAttributesFromPerkPoints()
     {
@@ -42,14 +41,15 @@ public class HumanScript : MonoBehaviour
         stomachSize = stomachSizePP * 1;
     }
 
-    
+
 
     public GameObject getRandomTargetObjectofTag(string tag)
     {
-        if(tag == "Bush")
-        {   
+        if (tag == "Bush")
+        {
             return this.GetComponentInParent<HumanManager>().bushManager.transform.GetChild(Random.Range(0, this.GetComponentInParent<HumanManager>().bushManager.transform.childCount)).gameObject;
-        }else if(tag == "Wolf")
+        }
+        else if (tag == "Wolf")
         {
             return this.GetComponentInParent<HumanManager>().wolfManager.transform.GetChild(Random.Range(0, this.GetComponentInParent<HumanManager>().wolfManager.transform.childCount)).gameObject;
         }
@@ -96,6 +96,10 @@ public class HumanScript : MonoBehaviour
             }
             indexes.RemoveAt(res_idx);
         }
+
+        huntChance = Random.Range(0.0f, 1.0f);
+        fleeChance = Random.Range(0.0f, 1.0f);
+
         calculateAttributesFromPerkPoints();
     }
 
@@ -133,7 +137,7 @@ public class HumanScript : MonoBehaviour
 
         Vector3 translation = targetObject.transform.position - this.transform.position;
 
-        if(translation.magnitude < 1)
+        if (translation.magnitude < 1)
         {
             retVar = true;
         }
@@ -141,7 +145,7 @@ public class HumanScript : MonoBehaviour
         return retVar;
     }
 
-    
+
 
     // Start is called before the first frame update
     void Start()
@@ -201,7 +205,7 @@ public class HumanScript : MonoBehaviour
 
             case CurrentState.fighting:
                 break;
-            
+
             case CurrentState.fleeing:
 
                 float fleeingDistance = 5;
@@ -212,7 +216,7 @@ public class HumanScript : MonoBehaviour
                 direction.Normalize();
                 this.transform.position += direction * Time.deltaTime * moveSpeed;
 
-                if(distance >= fleeingDistance)
+                if (distance >= fleeingDistance)
                 {
                     currentState = CurrentState.idle;
                 }
@@ -241,7 +245,7 @@ public class HumanScript : MonoBehaviour
                         targetObject = this.transform.parent.GetComponent<HumanManager>().Home.gameObject;
                     }
                 }
- 
+
 
                 break;
 
@@ -269,5 +273,33 @@ public class HumanScript : MonoBehaviour
         //flee check update
         //
         StateUpdate();
+    }
+
+    public void DecideFlight()
+    {
+        float choiceFloat = Random.Range(0.0f, 1.0f);
+
+        if( choiceFloat < fleeChance)
+        {
+            currentState = CurrentState.fleeing;
+        }
+        else
+        {
+            currentState = CurrentState.fighting;
+        }
+    }
+
+    void DecideActivity()
+    {
+        float choiceFloat = Random.Range(0.0f, 1.0f);
+
+        if (choiceFloat < huntChance)
+        {
+            currentState = CurrentState.hunting;
+        }
+        else
+        {
+            currentState = CurrentState.gatheringFood;
+        }
     }
 }

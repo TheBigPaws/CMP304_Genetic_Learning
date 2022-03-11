@@ -14,7 +14,7 @@ public class WolfManager : MonoBehaviour
     {
         for (int i = 0; i < 5; i++)
         {
-            Instantiate(WolfRef, this.transform).transform.position = this.transform.parent.position + new Vector3(Random.Range(-10f, 10f), Random.Range(-2f, 10f), 0f);
+            Instantiate(WolfRef, this.transform).transform.position = this.transform.position + new Vector3(Random.Range(-10f, 10f), Random.Range(-2f, 10f), 0f);
         }
     }
 
