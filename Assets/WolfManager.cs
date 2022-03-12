@@ -9,12 +9,17 @@ public class WolfManager : MonoBehaviour
 
     public GameObject WolfRef;
 
+    public void spawnRandomLocWolf()
+    {
+        Instantiate(WolfRef, this.transform).transform.position = this.transform.position + new Vector3(Random.Range(-10f, 10f), Random.Range(-2f, 10f), 0f);
+    }
+
     // Start is called before the first frame update
     void Start()
     {
         for (int i = 0; i < 5; i++)
         {
-            Instantiate(WolfRef, this.transform).transform.position = this.transform.position + new Vector3(Random.Range(-10f, 10f), Random.Range(-2f, 10f), 0f);
+            spawnRandomLocWolf();
         }
     }
 

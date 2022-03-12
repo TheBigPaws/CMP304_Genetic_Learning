@@ -17,7 +17,13 @@ public class HumanManager : MonoBehaviour
     {
         for(int i = 0; i < humanCount; i++)
         {
-            Instantiate(HumanRef,this.transform).transform.position = Home.transform.position;
+            GameObject go = Instantiate(HumanRef, this.transform);
+            go.transform.position = Home.transform.position;
+            go.GetComponent<HumanScript>().attributes.setRandom(go.GetComponent<HumanScript>().perkPoints);
+            go.GetComponent<HumanScript>().calculateAttributesFromPerkPoints();
+
+            Home.humans.Add(Instantiate<HumanScript>(go.GetComponent<HumanScript>(),Home.transform));
+            Debug.Log(go.GetComponent<HumanScript>().attributes.fleeChance);
         }
     }
 

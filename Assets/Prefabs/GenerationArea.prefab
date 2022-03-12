@@ -225,7 +225,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 780d9319c8cbce94cb448cb7657515c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  storedFood: 0
+  storedFood: 5
+  simulationLife: 0
+  humans: []
+  humanManager: {fileID: 7472207130960905624}
+  wolfManager: {fileID: 7472207130850057914}
+  bushManager: {fileID: 7472207129940857613}
 --- !u!1 &7472207130850057912
 GameObject:
   m_ObjectHideFlags: 0

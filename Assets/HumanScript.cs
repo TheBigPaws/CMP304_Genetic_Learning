@@ -7,178 +7,74 @@ public class HumanScript : MonoBehaviour
 {
     //HelperFunctions
     //perk points to assign
-    int perkPoints = 100;
+    public int perkPoints = 100;
 
-    public int healthPP = 1;
-    public int attackPP = 1;
-    public int carryPP = 1;
-    public int moveSpeedPP = 1;
-    public int stomachSizePP = 1;
+    public HelperFunctions.humanAttributes attributes;
 
     //actual values for this object
     public float health;
+    public float maxHealth;
     public float attack;
     public float carry;
     public float moveSpeed;
     public float stomachSize;
 
     //behaviour variables
+    public CurrentState currentState = CurrentState.idle;
+    public GameObject targetObject;
     public float actionTime;
     public float hunger;
-    public float eatingTriggerHungerFlat;
-    public GameObject targetObject;
     public float FoodInInventory;
-    public CurrentState currentState = CurrentState.idle;
-    public float fleeChance;
-    public float huntChance;
 
-    void calculateAttributesFromPerkPoints()
+
+    public void calculateAttributesFromPerkPoints()
     {
-        health = healthPP * 10;
-        attack = attackPP * 5;
-        moveSpeed = Mathf.Sqrt(moveSpeedPP);
-        carry = carryPP * 1;
-        stomachSize = stomachSizePP * 1;
+        maxHealth = attributes.healthPP * 10;
+        health = maxHealth;
+        attack = attributes.attackPP * 5;
+        moveSpeed = Mathf.Sqrt(attributes.moveSpeedPP);
+        carry = attributes.carryPP * 1;
+        stomachSize = attributes.stomachSizePP * 3;
+        hunger = stomachSize;
     }
 
 
-    public GameObject getRandomTargetObjectofTag(string tag)
-    {
-        if (tag == "Bush")
-        {
-            return this.GetComponentInParent<HumanManager>().bushManager.transform.GetChild(Random.Range(0, this.GetComponentInParent<HumanManager>().bushManager.transform.childCount)).gameObject;
-        }
-        else if (tag == "Wolf")
-        {
-            return this.GetComponentInParent<HumanManager>().wolfManager.transform.GetChild(Random.Range(0, this.GetComponentInParent<HumanManager>().wolfManager.transform.childCount)).gameObject;
-        }
-        //GameObject[] targetArr = GameObject.FindGameObjectsWithTag(tag);
-        //return targetArr[Random.Range(0, targetArr.Length)];
-        return null;
-    }
-
-    void setRandomAttributes()
-    {
-        List<int> indexes = new List<int>();
-        indexes.Add(1); //health;
-        indexes.Add(2); //attack;
-        indexes.Add(3); //carry;
-        indexes.Add(4); //moveSpeed;
-        indexes.Add(5); //stomachSize;
-
-        int PPleftToSpend = perkPoints;
-
-        for (int i = 0; i < 5; i++)
-        {
-            int res_idx = Random.Range(0, indexes.Count);
-            int ppAdd = Random.Range(0, PPleftToSpend);
-
-            PPleftToSpend -= ppAdd;
-
-            switch (indexes[res_idx])
-            {
-                case 1:
-                    healthPP += ppAdd;
-                    break;
-                case 2:
-                    attackPP += ppAdd;
-                    break;
-                case 3:
-                    carryPP += ppAdd;
-                    break;
-                case 4:
-                    moveSpeedPP += ppAdd;
-                    break;
-                case 5:
-                    stomachSizePP += ppAdd;
-                    break;
-            }
-            indexes.RemoveAt(res_idx);
-        }
-
-        huntChance = Random.Range(0.0f, 1.0f);
-        fleeChance = Random.Range(0.0f, 1.0f);
-
-        calculateAttributesFromPerkPoints();
-    }
-
-    //returns true if its arrived
-    //bool goToTargetObject()
-    //{
-    //
-    //    //failsafe if targetObject gets destroyed
-    //    if (!targetObject)
-    //    {
-    //        currentState = CurrentState.idle;
-    //        //finishedAction = true;
-    //        return false;
-    //    }
-    //
-    //    //go towards target object
-    //    if (!isAtTargetObject())
-    //    {
-    //        Vector3 direction = targetObject.transform.position - this.transform.position;
-    //        direction.Normalize();
-    //        this.transform.position += direction * Time.deltaTime * moveSpeed;
-    //    }
-    //    else
-    //    {
-    //        return true;
-    //    }
-    //    return false;
-    //}
-    //
-    //bool isAtTargetObject()
-    //{
-    //
-    //
-    //    bool retVar = false;
-    //
-    //    Vector3 translation = targetObject.transform.position - this.transform.position;
-    //
-    //    if (translation.magnitude < 1)
-    //    {
-    //        retVar = true;
-    //    }
-    //
-    //    return retVar;
-    //}
-
-
-    
-    // Start is called before the first frame update
-    void Start()
-    {
-        setRandomAttributes();
-    }
 
     void StateUpdate()
     {
+
+        //food node got fully used
+        if (!targetObject && currentState != CurrentState.idle)
+        {
+            currentState = CurrentState.idle;
+            //targetObject = HelperFunctions.getRandomTargetObjectInHolder(this.GetComponentInParent<HumanManager>().bushManager.transform);
+        }
+
         switch (currentState)
         {
             case CurrentState.idle:
                 //decide on what to do next
-
-                //find food
-
-                targetObject = getRandomTargetObjectofTag("Bush");
-                currentState = CurrentState.gatheringFood;
+                DecideActivity();
                 break;
 
 
             case CurrentState.storingFood:
 
+                //if arrived at targetObject (here house)
                 if (HelperFunctions.goToTargetObject(this.gameObject,targetObject,moveSpeed))
                 {
+                    //if there is still food in my inventory to store
                     if (FoodInInventory > 0)
                     {
                         float storeRate = 1;
-                        FoodInInventory -= Time.deltaTime * storeRate;
 
+                        //transfer it from my inventory to the house
+                        FoodInInventory -= Time.deltaTime * storeRate;
                         targetObject.GetComponent<HomeScript>().storedFood += Time.deltaTime * storeRate;
                     }
                     else
                     {
+                        //if there's no more food to store,
                         currentState = CurrentState.idle;
                     }
                 }
@@ -186,14 +82,21 @@ public class HumanScript : MonoBehaviour
 
 
             case CurrentState.eating:
+
+                //if arrived at targetObject (here house)
                 if (HelperFunctions.goToTargetObject(this.gameObject, targetObject, moveSpeed))
                 {
-                    if (hunger < stomachSize && targetObject.GetComponent<HomeScript>().storedFood > 0)
+                    //if stomach or health aren't full and there is still food to eat
+                    if ((hunger < stomachSize || health < maxHealth)&& targetObject.GetComponent<HomeScript>().storedFood > 0)
                     {
                         float eatingRate = 1;
-
+                        //eat and replenish health and hunger
                         hunger += Time.deltaTime * eatingRate;
                         targetObject.GetComponent<HomeScript>().storedFood -= Time.deltaTime * eatingRate;
+                        if(maxHealth > health)
+                        {
+                            health += Time.deltaTime * eatingRate;
+                        }
                     }
                     else
                     {
@@ -203,8 +106,14 @@ public class HumanScript : MonoBehaviour
                 break;
 
 
-            case CurrentState.fighting:
-                break;
+            case CurrentState.hunting:
+                //if arrived at targetObject (here enemy)
+                if (HelperFunctions.goToTargetObject(this.gameObject, targetObject, moveSpeed))
+                {
+
+                }
+
+                    break;
 
             case CurrentState.fleeing:
 
@@ -216,6 +125,7 @@ public class HumanScript : MonoBehaviour
                 direction.Normalize();
                 this.transform.position += direction * Time.deltaTime * moveSpeed;
 
+                //if i've run far enough
                 if (distance >= fleeingDistance)
                 {
                     currentState = CurrentState.idle;
@@ -225,12 +135,6 @@ public class HumanScript : MonoBehaviour
 
             case CurrentState.gatheringFood:
 
-                //food node got fully used
-                if (!targetObject)
-                {
-                    targetObject = getRandomTargetObjectofTag("Bush");
-                    currentState = CurrentState.gatheringFood;
-                }
 
                 if (HelperFunctions.goToTargetObject(this.gameObject, targetObject, moveSpeed))
                 {
@@ -260,6 +164,12 @@ public class HumanScript : MonoBehaviour
         }
     }
 
+    // Start is called before the first frame update
+    void Start()
+    {
+       
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -269,9 +179,7 @@ public class HumanScript : MonoBehaviour
 
     void FixedUpdate()
     {
-        //hungerUpdate
-        //flee check update
-        //
+        HungerHealthEatCheck();
         StateUpdate();
     }
 
@@ -279,7 +187,7 @@ public class HumanScript : MonoBehaviour
     {
         float choiceFloat = Random.Range(0.0f, 1.0f);
 
-        if( choiceFloat < fleeChance)
+        if( choiceFloat < attributes.fleeChance)
         {
             currentState = CurrentState.fleeing;
         }
@@ -293,13 +201,62 @@ public class HumanScript : MonoBehaviour
     {
         float choiceFloat = Random.Range(0.0f, 1.0f);
 
-        if (choiceFloat < huntChance)
+        if (choiceFloat < attributes.huntChance)
         {
             currentState = CurrentState.hunting;
+
+            //get random wolf that's not dead
+            targetObject = HelperFunctions.getRandomTargetObjectInHolder(this.GetComponentInParent<HumanManager>().wolfManager.transform);
+            while (!targetObject.GetComponent<WolfScript>())
+            {
+                targetObject = HelperFunctions.getRandomTargetObjectInHolder(this.GetComponentInParent<HumanManager>().wolfManager.transform);
+            }
         }
         else
         {
             currentState = CurrentState.gatheringFood;
+
+            //if there are any dead wolves, gather those (more food)
+            for(int i = 0; i < this.GetComponentInParent<HumanManager>().wolfManager.transform.childCount; i++)
+            {
+                if (this.GetComponentInParent<HumanManager>().wolfManager.transform.GetChild(i).GetComponent<FoodSource>())
+                {
+                    targetObject = this.GetComponentInParent<HumanManager>().wolfManager.transform.GetChild(i).gameObject;
+                    return;
+                }
+            }
+
+            //set random bush
+            targetObject = HelperFunctions.getRandomTargetObjectInHolder(this.GetComponentInParent<HumanManager>().bushManager.transform);
+
         }
+    }
+
+    void HungerHealthEatCheck()
+    {
+        //decrement hunger
+        hunger -= Time.deltaTime;
+
+        if(hunger < 0)
+        {
+            Destroy(this.gameObject);
+        }
+
+        //if health is too low, start fleeing
+        if(currentState == CurrentState.fighting && health < attributes.eatingTriggerHealthFlat)
+        {
+            currentState = CurrentState.fleeing;
+        }
+
+        if(currentState != CurrentState.fighting && currentState != CurrentState.fleeing)
+        {
+            //check if hungry/hurt enough to go eat
+            if (health < attributes.eatingTriggerHealthFlat || hunger < attributes.eatingTriggerHungerFlat)
+            {
+                currentState = CurrentState.eating;
+                targetObject = this.GetComponentInParent<HumanManager>().Home.gameObject;
+            }
+        }
+        
     }
 }

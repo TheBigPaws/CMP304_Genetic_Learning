@@ -5,7 +5,7 @@ using UnityEngine;
 public class FoodSource : MonoBehaviour
 {
     public float FoodAmount;
-
+    public bool isBush = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -28,8 +28,14 @@ public class FoodSource : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
+
         if (FoodAmount <= 0)
         {
+            if (isBush)
+            {
+                this.GetComponentInParent<BushManager>().spawnRandomLocBush();
+            }
             Destroy(this.gameObject);
         }
     }

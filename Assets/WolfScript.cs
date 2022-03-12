@@ -5,10 +5,10 @@ using UnityEngine;
 public class WolfScript : MonoBehaviour
 {
     public float health = 500;
-    public float attack = 50;
+    public float attack = 30;
     public float moveSpeed = 5;
     
-    CurrentState currentState = CurrentState.idle;
+    public CurrentState currentState = CurrentState.idle;
     public GameObject targetObject;
 
     Vector3 wanderEndLocation;
@@ -62,16 +62,13 @@ public class WolfScript : MonoBehaviour
 
             case CurrentState.hunting:
 
-                
-                if (Vector3.Distance(this.transform.position,targetObject.transform.position) < 0.2f)
+                if (HelperFunctions.goToTargetObject(this.gameObject, targetObject.gameObject, moveSpeed))
                 {
                     currentState = CurrentState.fighting;
                 }
-                else
+                if(Vector3.Distance(this.transform.position,targetObject.transform.position) > 3)
                 {
-                    Vector3 direction_ = targetObject.transform.position - this.transform.position;
-
-                    this.transform.position += direction_.normalized * Time.deltaTime * moveSpeed;
+                    currentState = CurrentState.idle;
                 }
                 break;
 
@@ -102,7 +99,13 @@ public class WolfScript : MonoBehaviour
 
                     if (health <= 0)
                     {
-                        Destroy(this.gameObject);
+                        this.GetComponent<SpriteRenderer>().color = new Color(1.0f, 0.5f, 0.5f);
+
+                        this.gameObject.AddComponent<FoodSource>();
+                        this.gameObject.GetComponent<FoodSource>().FoodAmount = 20;
+
+                        this.GetComponentInParent<WolfManager>().spawnRandomLocWolf();
+                        Destroy(this);
                     }
 
                     

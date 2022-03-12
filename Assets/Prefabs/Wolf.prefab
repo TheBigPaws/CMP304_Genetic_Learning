@@ -98,5 +98,6 @@ MonoBehaviour:
   health: 500
   attack: 50
   moveSpeed: 5
+  currentState: 0
   targetObject: {fileID: 0}
   attackTime: 0
