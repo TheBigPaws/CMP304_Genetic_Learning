@@ -42,7 +42,6 @@ public class HumanScript : MonoBehaviour
     }
 
 
-
     public GameObject getRandomTargetObjectofTag(string tag)
     {
         if (tag == "Bush")
@@ -104,49 +103,49 @@ public class HumanScript : MonoBehaviour
     }
 
     //returns true if its arrived
-    bool goToTargetObject()
-    {
+    //bool goToTargetObject()
+    //{
+    //
+    //    //failsafe if targetObject gets destroyed
+    //    if (!targetObject)
+    //    {
+    //        currentState = CurrentState.idle;
+    //        //finishedAction = true;
+    //        return false;
+    //    }
+    //
+    //    //go towards target object
+    //    if (!isAtTargetObject())
+    //    {
+    //        Vector3 direction = targetObject.transform.position - this.transform.position;
+    //        direction.Normalize();
+    //        this.transform.position += direction * Time.deltaTime * moveSpeed;
+    //    }
+    //    else
+    //    {
+    //        return true;
+    //    }
+    //    return false;
+    //}
+    //
+    //bool isAtTargetObject()
+    //{
+    //
+    //
+    //    bool retVar = false;
+    //
+    //    Vector3 translation = targetObject.transform.position - this.transform.position;
+    //
+    //    if (translation.magnitude < 1)
+    //    {
+    //        retVar = true;
+    //    }
+    //
+    //    return retVar;
+    //}
 
-        //failsafe if targetObject gets destroyed
-        if (!targetObject)
-        {
-            currentState = CurrentState.idle;
-            //finishedAction = true;
-            return false;
-        }
 
-        //go towards target object
-        if (!isAtTargetObject())
-        {
-            Vector3 direction = targetObject.transform.position - this.transform.position;
-            direction.Normalize();
-            this.transform.position += direction * Time.deltaTime * moveSpeed;
-        }
-        else
-        {
-            return true;
-        }
-        return false;
-    }
-
-    bool isAtTargetObject()
-    {
-
-
-        bool retVar = false;
-
-        Vector3 translation = targetObject.transform.position - this.transform.position;
-
-        if (translation.magnitude < 1)
-        {
-            retVar = true;
-        }
-
-        return retVar;
-    }
-
-
-
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -161,6 +160,7 @@ public class HumanScript : MonoBehaviour
                 //decide on what to do next
 
                 //find food
+
                 targetObject = getRandomTargetObjectofTag("Bush");
                 currentState = CurrentState.gatheringFood;
                 break;
@@ -168,7 +168,7 @@ public class HumanScript : MonoBehaviour
 
             case CurrentState.storingFood:
 
-                if (goToTargetObject())
+                if (HelperFunctions.goToTargetObject(this.gameObject,targetObject,moveSpeed))
                 {
                     if (FoodInInventory > 0)
                     {
@@ -186,7 +186,7 @@ public class HumanScript : MonoBehaviour
 
 
             case CurrentState.eating:
-                if (goToTargetObject())
+                if (HelperFunctions.goToTargetObject(this.gameObject, targetObject, moveSpeed))
                 {
                     if (hunger < stomachSize && targetObject.GetComponent<HomeScript>().storedFood > 0)
                     {
@@ -232,7 +232,7 @@ public class HumanScript : MonoBehaviour
                     currentState = CurrentState.gatheringFood;
                 }
 
-                if (goToTargetObject())
+                if (HelperFunctions.goToTargetObject(this.gameObject, targetObject, moveSpeed))
                 {
                     //extract food
                     FoodInInventory += targetObject.GetComponent<FoodSource>().extractFood();
@@ -250,7 +250,7 @@ public class HumanScript : MonoBehaviour
                 break;
 
             case CurrentState.goingToEnemy:
-                if (goToTargetObject())
+                if (HelperFunctions.goToTargetObject(this.gameObject, targetObject, moveSpeed))
                 {
                     //finishedAction = false;
                     currentState = CurrentState.fighting;

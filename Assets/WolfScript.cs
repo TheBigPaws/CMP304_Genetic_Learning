@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class WolfScript : MonoBehaviour
 {
-
     public float health = 500;
     public float attack = 50;
     public float moveSpeed = 5;
@@ -20,6 +19,16 @@ public class WolfScript : MonoBehaviour
     {
         //update attack check
         
+        if(currentState != CurrentState.idle)
+        {
+            if (!targetObject)
+            {
+                currentState = CurrentState.idle;
+                
+
+            }
+
+        }
 
         switch (currentState)
         {
@@ -53,7 +62,8 @@ public class WolfScript : MonoBehaviour
 
             case CurrentState.hunting:
 
-                if(Vector3.Distance(this.transform.position,targetObject.transform.position) < 0.2f)
+                
+                if (Vector3.Distance(this.transform.position,targetObject.transform.position) < 0.2f)
                 {
                     currentState = CurrentState.fighting;
                 }
@@ -67,12 +77,7 @@ public class WolfScript : MonoBehaviour
 
             case CurrentState.fighting:
 
-                if (!targetObject)
-                {
-                    currentState = CurrentState.idle;
-                }
-
-                if (Vector3.Distance(this.transform.position, targetObject.transform.position) > 0.3f)
+                if (Vector3.Distance(this.transform.position, targetObject.transform.position) > 0.4f)
                 {
                     currentState = CurrentState.hunting;
                 }

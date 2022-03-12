@@ -7,20 +7,27 @@ public enum CurrentState { idle, goingToEnemy, storingFood, gatheringFood, eatin
 
 
 
-public class HelperFunctions : MonoBehaviour
+public static class HelperFunctions
 {
-
-    
-
-    // Start is called before the first frame update
-    void Start()
+    //returns true if its arrived
+    public static bool goToTargetObject(GameObject subject, GameObject targetObject, float moveSpeed)
     {
-        
+
+
+        //go towards target object
+        if (Vector3.Distance(subject.transform.position,targetObject.transform.position)< 0.2f)
+        {
+            return true;
+            
+        }
+        else
+        {
+            Vector3 direction = targetObject.transform.position - subject.transform.position;
+            direction.Normalize();
+            subject.transform.position += direction * Time.deltaTime * moveSpeed;
+        }
+        return false;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
 }
