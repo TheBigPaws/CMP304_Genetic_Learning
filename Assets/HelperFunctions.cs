@@ -1,20 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public enum CurrentState { idle, goingToEnemy, storingFood, gatheringFood, eating, fighting, fleeing, hunting, none };
+public enum CurrentState { idle, storingFood, gatheringFood, eating, fighting, fleeing, hunting, none };
 
 
 
 
 public static class HelperFunctions
 {
+
+    public static void spawnText(Vector3 position, string text, IconType type)
+    {
+        GameObject a = MonoBehaviour.Instantiate(Transform.FindObjectOfType<ApplicationDataScript>().popT);
+        a.transform.position = position;
+        a.GetComponent<PopupTextScript>().Setup(text, type);
+    }
+
     //returns true if its arrived
     public static bool goToTargetObject(GameObject subject, GameObject targetObject, float moveSpeed)
     {
 
 
-        //go towards target object
+        //if at the object, return true
         if (Vector3.Distance(subject.transform.position,targetObject.transform.position)< 0.2f)
         {
             return true;
@@ -22,6 +31,7 @@ public static class HelperFunctions
         }
         else
         {
+            //if not there, go towards it and return false
             Vector3 direction = targetObject.transform.position - subject.transform.position;
             direction.Normalize();
             subject.transform.position += direction * Time.deltaTime * moveSpeed;
@@ -36,13 +46,15 @@ public static class HelperFunctions
 
     public struct humanAttributes
     {
+        public float timeSurvived;
+        public float foodGathered;
+        public int wolvesKilled;
 
         public int healthPP;
         public int attackPP;
         public int carryPP;
         public int moveSpeedPP;
         public int stomachSizePP;
-
 
         public float eatingTriggerHungerFlat;
         public float eatingTriggerHealthFlat;

@@ -22,8 +22,7 @@ public class HumanManager : MonoBehaviour
             go.GetComponent<HumanScript>().attributes.setRandom(go.GetComponent<HumanScript>().perkPoints);
             go.GetComponent<HumanScript>().calculateAttributesFromPerkPoints();
 
-            Home.humans.Add(Instantiate<HumanScript>(go.GetComponent<HumanScript>(),Home.transform));
-            Debug.Log(go.GetComponent<HumanScript>().attributes.fleeChance);
+            //Home.humans.Add(Instantiate<HumanScript>(go.GetComponent<HumanScript>(),Home.transform));
         }
     }
 

@@ -11,6 +11,7 @@ public class WolfScript : MonoBehaviour
     public CurrentState currentState = CurrentState.idle;
     public GameObject targetObject;
 
+
     Vector3 wanderEndLocation;
     float waitTime;
     public float attackTime;
@@ -91,24 +92,45 @@ public class WolfScript : MonoBehaviour
                     health -= targetObject.GetComponent<HumanScript>().attack;
                     targetObject.GetComponent<HumanScript>().health -= attack;
 
+
+
                     //death cases
                     if (targetObject.GetComponent<HumanScript>().health <= 0)
                     {
-                        Destroy(targetObject.GetComponent<HumanScript>().gameObject);
-                    } 
+                        targetObject.GetComponent<HumanScript>().dieAndRecord();
+
+                        HelperFunctions.spawnText(targetObject.transform.position, "-" + (attack + targetObject.GetComponent<HumanScript>().health).ToString(), IconType.heart);
+
+                        //write down dead human data
+                        targetObject = null;
+                    }
+                    else
+                    {
+                        HelperFunctions.spawnText(targetObject.transform.position, "-" + (attack).ToString(), IconType.heart);
+                    }
 
                     if (health <= 0)
                     {
+                        HelperFunctions.spawnText(transform.position, "-" + (targetObject.GetComponent<HumanScript>().attack + health).ToString(), IconType.heart);
+
                         this.GetComponent<SpriteRenderer>().color = new Color(1.0f, 0.5f, 0.5f);
 
+                        //make this object into a food source
                         this.gameObject.AddComponent<FoodSource>();
-                        this.gameObject.GetComponent<FoodSource>().FoodAmount = 20;
+                        this.gameObject.GetComponent<FoodSource>().FoodAmount = 60;
 
+                        this.gameObject.transform.SetParent(this.GetComponentInParent<WolfManager>().humanManager.bushManager.transform);
+
+                        //spawn a new wolf
                         this.GetComponentInParent<WolfManager>().spawnRandomLocWolf();
                         Destroy(this);
                     }
+                    else
+                    {
+                        HelperFunctions.spawnText(transform.position, "-" + (targetObject.GetComponent<HumanScript>().attack).ToString(), IconType.heart);
+                    }
 
-                    
+
                 }
                 break;
         }

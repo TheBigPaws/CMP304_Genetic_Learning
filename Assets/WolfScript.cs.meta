@@ -3,7 +3,9 @@ guid: dcd1d426ca481374690cb007c10087a4
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - targetObject: {instanceID: 0}
+  - popupTextRef: {fileID: 4282655769131581414, guid: 67d7d82d537329941a1b4999aad4e1e9, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

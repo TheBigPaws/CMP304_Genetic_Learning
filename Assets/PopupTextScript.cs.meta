@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 8ddd4e55c21922842a5b956569c9263c
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - iconRef: {instanceID: 0}
+  - heartSprite: {fileID: 21300000, guid: 904a9edaabf3e72478f7f3ee131a61c6, type: 3}
+  - hungerSprite: {fileID: 21300000, guid: d6b1d684c14c06a45bfc68d9753975c4, type: 3}
+  - foodSprite: {fileID: 21300000, guid: 3a1f404eccfe1954784c468960a2a6b9, type: 3}
+  - popupTextRef: {fileID: 4282655769131581414, guid: 67d7d82d537329941a1b4999aad4e1e9, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

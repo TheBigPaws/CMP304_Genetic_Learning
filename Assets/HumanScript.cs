@@ -22,7 +22,7 @@ public class HumanScript : MonoBehaviour
     //behaviour variables
     public CurrentState currentState = CurrentState.idle;
     public GameObject targetObject;
-    public float actionTime;
+    //public float actionTime;
     public float hunger;
     public float FoodInInventory;
 
@@ -38,74 +38,117 @@ public class HumanScript : MonoBehaviour
         hunger = stomachSize;
     }
 
+    public void dieAndRecord()
+    {
 
+        Destroy(this.gameObject);
+    }
 
     void StateUpdate()
     {
 
-        //food node got fully used
+        //only on idle should there be no targetObject
         if (!targetObject && currentState != CurrentState.idle)
         {
             currentState = CurrentState.idle;
-            //targetObject = HelperFunctions.getRandomTargetObjectInHolder(this.GetComponentInParent<HumanManager>().bushManager.transform);
         }
 
         switch (currentState)
         {
+            //----------------------------------IDLE: Decide on what to do next
             case CurrentState.idle:
                 //decide on what to do next
                 DecideActivity();
                 break;
 
-
-            case CurrentState.storingFood:
-
-                //if arrived at targetObject (here house)
-                if (HelperFunctions.goToTargetObject(this.gameObject,targetObject,moveSpeed))
-                {
-                    //if there is still food in my inventory to store
-                    if (FoodInInventory > 0)
-                    {
-                        float storeRate = 1;
-
-                        //transfer it from my inventory to the house
-                        FoodInInventory -= Time.deltaTime * storeRate;
-                        targetObject.GetComponent<HomeScript>().storedFood += Time.deltaTime * storeRate;
-                    }
-                    else
-                    {
-                        //if there's no more food to store,
-                        currentState = CurrentState.idle;
-                    }
-                }
-                break;
+            //----------------------------------GATHERING FOOD: go to a food source and gather food
+            case CurrentState.gatheringFood:
 
 
-            case CurrentState.eating:
-
-                //if arrived at targetObject (here house)
                 if (HelperFunctions.goToTargetObject(this.gameObject, targetObject, moveSpeed))
                 {
-                    //if stomach or health aren't full and there is still food to eat
-                    if ((hunger < stomachSize || health < maxHealth)&& targetObject.GetComponent<HomeScript>().storedFood > 0)
+                    //attempting extracting as much food as possible
+                    FoodInInventory += targetObject.GetComponent<FoodSource>().extractFood(carry - FoodInInventory);
+
+                    //inventory full
+                    if (FoodInInventory >= carry)
                     {
-                        float eatingRate = 1;
-                        //eat and replenish health and hunger
-                        hunger += Time.deltaTime * eatingRate;
-                        targetObject.GetComponent<HomeScript>().storedFood -= Time.deltaTime * eatingRate;
-                        if(maxHealth > health)
-                        {
-                            health += Time.deltaTime * eatingRate;
-                        }
+                        //set state to storing food
+                        currentState = CurrentState.storingFood;
+                        targetObject = this.transform.parent.GetComponent<HumanManager>().Home.gameObject;
                     }
-                    else
-                    {
-                        currentState = CurrentState.idle;
-                    }
+                }
+
+
+                break;
+
+            //----------------------------------STORING FOOD: go to house and store food
+            case CurrentState.storingFood:
+
+                //if arrived at house
+                if (HelperFunctions.goToTargetObject(this.gameObject,targetObject,moveSpeed))
+                {
+                    //store all my food
+                    targetObject.GetComponent<HomeScript>().storedFood += FoodInInventory;
+                    FoodInInventory = 0;
+                    currentState = CurrentState.idle;
+
+                    //TODO UI display stored
                 }
                 break;
 
+            //----------------------------------EATING FOOD: go to house and eat food
+            case CurrentState.eating:
 
+                //if arrived at house
+                if (HelperFunctions.goToTargetObject(this.gameObject, targetObject, moveSpeed))
+                {
+
+                    float FoodEaten = 0;
+
+                    float healthDiff = maxHealth - health;
+
+                    float hungerDiff = stomachSize - hunger;
+
+                    //if there is enough food to fill hunger fully, fill it
+                    if(hungerDiff < targetObject.GetComponent<HomeScript>().storedFood)
+                    {
+                        FoodEaten += hungerDiff;
+                        targetObject.GetComponent<HomeScript>().storedFood -= hungerDiff;
+                        HelperFunctions.spawnText(transform.position, "+" + hungerDiff, IconType.hunger);
+
+                        //if there is enough food to heal fully, do it
+                        if (healthDiff < targetObject.GetComponent<HomeScript>().storedFood)
+                        {
+                            FoodEaten += healthDiff;
+                            targetObject.GetComponent<HomeScript>().storedFood -= healthDiff;
+                            currentState = CurrentState.idle;
+                            HelperFunctions.spawnText(transform.position, "+" + healthDiff, IconType.heart);
+
+                        }
+                        else //eat the rest
+                        {
+                            FoodEaten += targetObject.GetComponent<HomeScript>().storedFood;
+                            HelperFunctions.spawnText(transform.position, "+" + targetObject.GetComponent<HomeScript>().storedFood, IconType.heart);
+
+                            targetObject.GetComponent<HomeScript>().storedFood = 0;
+                            currentState = CurrentState.idle;
+                        }
+                    }
+                    else//else just eat all the food left
+                    {
+                        FoodEaten = targetObject.GetComponent<HomeScript>().storedFood;
+
+                        HelperFunctions.spawnText(transform.position, "+" + FoodEaten, IconType.hunger);
+                        targetObject.GetComponent<HomeScript>().storedFood = 0;
+                        currentState = CurrentState.idle;
+                    }
+
+                    HelperFunctions.spawnText(targetObject.transform.position, "-" + FoodEaten, IconType.food);
+                }
+                break;
+
+            //----------------------------------HUNTING: Go To Enemy
             case CurrentState.hunting:
                 //if arrived at targetObject (here enemy)
                 if (HelperFunctions.goToTargetObject(this.gameObject, targetObject, moveSpeed))
@@ -113,8 +156,9 @@ public class HumanScript : MonoBehaviour
 
                 }
 
-                    break;
+                break;
 
+            //----------------------------------FLEEING:
             case CurrentState.fleeing:
 
                 float fleeingDistance = 5;
@@ -125,41 +169,12 @@ public class HumanScript : MonoBehaviour
                 direction.Normalize();
                 this.transform.position += direction * Time.deltaTime * moveSpeed;
 
-                //if i've run far enough
+                //if run far enough, back to idle
                 if (distance >= fleeingDistance)
                 {
                     currentState = CurrentState.idle;
                 }
 
-                break;
-
-            case CurrentState.gatheringFood:
-
-
-                if (HelperFunctions.goToTargetObject(this.gameObject, targetObject, moveSpeed))
-                {
-                    //extract food
-                    FoodInInventory += targetObject.GetComponent<FoodSource>().extractFood();
-
-                    //inventory full
-                    if (FoodInInventory >= carry)
-                    {
-                        //finishedAction = false;
-                        currentState = CurrentState.storingFood;
-                        targetObject = this.transform.parent.GetComponent<HumanManager>().Home.gameObject;
-                    }
-                }
-
-
-                break;
-
-            case CurrentState.goingToEnemy:
-                if (HelperFunctions.goToTargetObject(this.gameObject, targetObject, moveSpeed))
-                {
-                    //finishedAction = false;
-                    currentState = CurrentState.fighting;
-                    //targetObject.GetComponent
-                }
                 break;
         }
     }
@@ -173,7 +188,6 @@ public class HumanScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //goToTargetObject();
 
     }
 
@@ -185,46 +199,37 @@ public class HumanScript : MonoBehaviour
 
     public void DecideFlight()
     {
+        //random float to decide
         float choiceFloat = Random.Range(0.0f, 1.0f);
 
-        if( choiceFloat < attributes.fleeChance)
+        //if within the range of flee, set state as flee
+        if ( choiceFloat < attributes.fleeChance)
         {
             currentState = CurrentState.fleeing;
         }
         else
         {
+            //else fight back
             currentState = CurrentState.fighting;
         }
     }
 
     void DecideActivity()
     {
+        //random float to decide
         float choiceFloat = Random.Range(0.0f, 1.0f);
 
+        //if within the range of hunt, set state as hunting
         if (choiceFloat < attributes.huntChance)
         {
             currentState = CurrentState.hunting;
 
             //get random wolf that's not dead
             targetObject = HelperFunctions.getRandomTargetObjectInHolder(this.GetComponentInParent<HumanManager>().wolfManager.transform);
-            while (!targetObject.GetComponent<WolfScript>())
-            {
-                targetObject = HelperFunctions.getRandomTargetObjectInHolder(this.GetComponentInParent<HumanManager>().wolfManager.transform);
-            }
         }
         else
         {
             currentState = CurrentState.gatheringFood;
-
-            //if there are any dead wolves, gather those (more food)
-            for(int i = 0; i < this.GetComponentInParent<HumanManager>().wolfManager.transform.childCount; i++)
-            {
-                if (this.GetComponentInParent<HumanManager>().wolfManager.transform.GetChild(i).GetComponent<FoodSource>())
-                {
-                    targetObject = this.GetComponentInParent<HumanManager>().wolfManager.transform.GetChild(i).gameObject;
-                    return;
-                }
-            }
 
             //set random bush
             targetObject = HelperFunctions.getRandomTargetObjectInHolder(this.GetComponentInParent<HumanManager>().bushManager.transform);
@@ -234,29 +239,28 @@ public class HumanScript : MonoBehaviour
 
     void HungerHealthEatCheck()
     {
+        attributes.timeSurvived += Time.deltaTime;
+
         //decrement hunger
         hunger -= Time.deltaTime;
 
         if(hunger < 0)
         {
-            Destroy(this.gameObject);
+            dieAndRecord();
         }
-
-        //if health is too low, start fleeing
-        if(currentState == CurrentState.fighting && health < attributes.eatingTriggerHealthFlat)
+        //whenever not fighting or fleeing
+        if (currentState != CurrentState.fighting && currentState != CurrentState.fleeing)
         {
-            currentState = CurrentState.fleeing;
-        }
-
-        if(currentState != CurrentState.fighting && currentState != CurrentState.fleeing)
-        {
-            //check if hungry/hurt enough to go eat
-            if (health < attributes.eatingTriggerHealthFlat || hunger < attributes.eatingTriggerHungerFlat)
+            //if there's any food at home
+            if (this.GetComponentInParent<HumanManager>().Home.storedFood > 0)
             {
-                currentState = CurrentState.eating;
-                targetObject = this.GetComponentInParent<HumanManager>().Home.gameObject;
+                //check if hungry/hurt enough to go eat
+                if (health < attributes.eatingTriggerHealthFlat || hunger < attributes.eatingTriggerHungerFlat)
+                {
+                    currentState = CurrentState.eating;
+                    targetObject = this.GetComponentInParent<HumanManager>().Home.gameObject;
+                }
             }
         }
-        
     }
 }

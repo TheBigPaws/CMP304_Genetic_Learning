@@ -5,6 +5,7 @@ using UnityEngine;
 public class ApplicationDataScript : MonoBehaviour
 {
     public float ElapsedTime = 0f;
+    public GameObject popT;
     // Start is called before the first frame update
     void Start()
     {

@@ -100,4 +100,5 @@ MonoBehaviour:
   moveSpeed: 5
   currentState: 0
   targetObject: {fileID: 0}
+  popupTextRef: {fileID: 4282655769131581414, guid: 67d7d82d537329941a1b4999aad4e1e9, type: 3}
   attackTime: 0
