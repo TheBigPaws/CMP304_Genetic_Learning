@@ -202,16 +202,20 @@ public class HumanScript : MonoBehaviour
         //random float to decide
         float choiceFloat = Random.Range(0.0f, 1.0f);
 
-        //if within the range of flee, set state as flee
-        if ( choiceFloat < attributes.fleeChance)
+        if(currentState != CurrentState.fighting && currentState != CurrentState.fleeing)
         {
-            currentState = CurrentState.fleeing;
+            //if within the range of flee, set state as flee
+            if (choiceFloat < attributes.fleeChance)
+            {
+                currentState = CurrentState.fleeing;
+            }
+            else
+            {
+                //else fight back
+                currentState = CurrentState.fighting;
+            }
         }
-        else
-        {
-            //else fight back
-            currentState = CurrentState.fighting;
-        }
+
     }
 
     void DecideActivity()

@@ -7,6 +7,8 @@ public class BushManager : MonoBehaviour
 
     public GameObject BushRef;
 
+    public int bushToSpawn = 5;
+
     public void spawnRandomLocBush()
     {
         GameObject go = Instantiate(BushRef, this.transform);
@@ -17,7 +19,7 @@ public class BushManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < bushToSpawn; i++)
         {
             spawnRandomLocBush();
         }

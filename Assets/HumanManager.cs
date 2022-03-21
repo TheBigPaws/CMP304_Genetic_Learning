@@ -8,14 +8,14 @@ public class HumanManager : MonoBehaviour
     public WolfManager wolfManager;
     public BushManager bushManager;
     public HomeScript Home;
-    int humanCount = 5;
+    public int HumansToSpawn = 5;
 
     public GameObject HumanRef;
 
     // Start is called before the first frame update
     void Start()
     {
-        for(int i = 0; i < humanCount; i++)
+        for(int i = 0; i < HumansToSpawn; i++)
         {
             GameObject go = Instantiate(HumanRef, this.transform);
             go.transform.position = Home.transform.position;

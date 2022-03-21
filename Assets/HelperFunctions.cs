@@ -68,7 +68,7 @@ public static class HelperFunctions
             attackPP = 1;
             carryPP = 1;
             moveSpeedPP = 1;
-            stomachSizePP = 1;
+            stomachSizePP = 5;
 
             while (PPleftToSpend > 0)
             {

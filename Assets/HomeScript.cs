@@ -46,7 +46,7 @@ public class HomeScript : MonoBehaviour
             //    Destroy(bushManager.transform.GetChild(0).gameObject);
             //}
             Debug.Log("Simulation ran for " + simulationLife.ToString() + " seconds.");
-            printHumanAttributes();
+            //printHumanAttributes();
         }
         
     }

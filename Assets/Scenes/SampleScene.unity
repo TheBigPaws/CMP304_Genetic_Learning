@@ -306,5 +306,13 @@ PrefabInstance:
       propertyPath: m_Name
       value: GenerationArea
       objectReference: {fileID: 0}
+    - target: {fileID: 7472207130850057914, guid: fd508e62f642c144b8ff5186e60d66d2, type: 3}
+      propertyPath: WolfToSpawn
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7472207130960905624, guid: fd508e62f642c144b8ff5186e60d66d2, type: 3}
+      propertyPath: HumansToSpawn
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fd508e62f642c144b8ff5186e60d66d2, type: 3}

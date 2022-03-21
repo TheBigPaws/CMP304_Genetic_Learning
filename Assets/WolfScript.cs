@@ -79,6 +79,13 @@ public class WolfScript : MonoBehaviour
                 {
                     currentState = CurrentState.hunting;
                 }
+                
+                //if targetobject is not fighting or fleeing, decide to do either
+                if(targetObject.GetComponent<HumanScript>().currentState != CurrentState.fighting && targetObject.GetComponent<HumanScript>().currentState != CurrentState.fleeing)
+                {
+                    targetObject.GetComponent<HumanScript>().DecideFlight();
+                    targetObject.GetComponent<HumanScript>().targetObject = this.gameObject;
+                }
 
                 if (attackTime > 0) //wait for next hit
                 {
@@ -92,12 +99,35 @@ public class WolfScript : MonoBehaviour
                     health -= targetObject.GetComponent<HumanScript>().attack;
                     targetObject.GetComponent<HumanScript>().health -= attack;
 
+                    if (health <= 0)
+                    {
+                        HelperFunctions.spawnText(transform.position, "-" + (targetObject.GetComponent<HumanScript>().attack + health).ToString(), IconType.heart);
 
+                        targetObject.GetComponent<HumanScript>().currentState = CurrentState.idle;
+
+                        this.GetComponent<SpriteRenderer>().color = new Color(1.0f, 0.5f, 0.5f);
+
+                        //make this object into a food source
+                        this.gameObject.AddComponent<FoodSource>();
+                        this.gameObject.GetComponent<FoodSource>().FoodAmount = 60;
+
+                        this.GetComponentInParent<WolfManager>().spawnRandomLocWolf();
+
+                        this.gameObject.transform.SetParent(this.GetComponentInParent<WolfManager>().humanManager.bushManager.transform);
+                        //spawn a new wolf
+                        Destroy(this);
+                    }
+                    else
+                    {
+                        HelperFunctions.spawnText(transform.position, "-" + (targetObject.GetComponent<HumanScript>().attack).ToString(), IconType.heart);
+                    }
 
                     //death cases
                     if (targetObject.GetComponent<HumanScript>().health <= 0)
                     {
                         targetObject.GetComponent<HumanScript>().dieAndRecord();
+
+                        this.currentState = CurrentState.idle;
 
                         HelperFunctions.spawnText(targetObject.transform.position, "-" + (attack + targetObject.GetComponent<HumanScript>().health).ToString(), IconType.heart);
 
@@ -108,29 +138,6 @@ public class WolfScript : MonoBehaviour
                     {
                         HelperFunctions.spawnText(targetObject.transform.position, "-" + (attack).ToString(), IconType.heart);
                     }
-
-                    if (health <= 0)
-                    {
-                        HelperFunctions.spawnText(transform.position, "-" + (targetObject.GetComponent<HumanScript>().attack + health).ToString(), IconType.heart);
-
-                        this.GetComponent<SpriteRenderer>().color = new Color(1.0f, 0.5f, 0.5f);
-
-                        //make this object into a food source
-                        this.gameObject.AddComponent<FoodSource>();
-                        this.gameObject.GetComponent<FoodSource>().FoodAmount = 60;
-
-                        this.gameObject.transform.SetParent(this.GetComponentInParent<WolfManager>().humanManager.bushManager.transform);
-
-                        //spawn a new wolf
-                        this.GetComponentInParent<WolfManager>().spawnRandomLocWolf();
-                        Destroy(this);
-                    }
-                    else
-                    {
-                        HelperFunctions.spawnText(transform.position, "-" + (targetObject.GetComponent<HumanScript>().attack).ToString(), IconType.heart);
-                    }
-
-
                 }
                 break;
         }
@@ -138,7 +145,7 @@ public class WolfScript : MonoBehaviour
 
     void CheckForNearbyHumans()
     {
-
+        bool ret = false;
         for (int i = 0; i < this.GetComponentInParent<WolfManager>().humanManager.transform.childCount; i++)
         {
 
@@ -149,10 +156,15 @@ public class WolfScript : MonoBehaviour
                 targetObject = tempGOholder;
                 currentState = CurrentState.hunting;
                 targetObject.GetComponent<HumanScript>().DecideFlight();
-                return;
+
+                ret = true;
             }
 
-        }        
+        }
+        if (ret)
+        {
+            targetObject.GetComponent<HumanScript>().targetObject = this.gameObject;
+        }
     }
 
     // Start is called before the first frame update
