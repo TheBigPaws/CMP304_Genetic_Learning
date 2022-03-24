@@ -7,8 +7,11 @@ public class HomeScript : MonoBehaviour
     //TextMesh storedFoodText;
     public float storedFood = 0f;
     public float simulationLife = 0f;
+    public float simulationfitness = 0f;
 
-    public List<HumanScript> humans;
+    //public List<HelperFunctions.humanAttributes> humans = new List<HelperFunctions.humanAttributes>();
+    public HelperFunctions.HumanGroupAttributes groupAttributes;
+    
     bool running = true;
 
     public HumanManager humanManager;
@@ -18,8 +21,7 @@ public class HomeScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //storedFoodText = Instantiate<TextMesh>(new TextMesh());
-        //storedFoodText.transform.position = this.transform.position;
+        groupAttributes.setup();
     }
 
     // Update is called once per frame
@@ -28,37 +30,50 @@ public class HomeScript : MonoBehaviour
         if (running)
         {
            simulationLife += Time.deltaTime;
-        }
 
-        //storedFoodText.text = storedFood.ToString();
+            if (humanManager.transform.childCount == 0)
+            {
+                running = false;
+
+                Debug.Log("Simulation ran for " + simulationLife.ToString() + " seconds.");
+                printHumanAttributes();
+
+
+                bool allFinished = true;
+
+                foreach(HomeScript child in FindObjectsOfType<HomeScript>())
+                {
+                    if (child.running)
+                    {
+                        allFinished = false;
+                    }
+                }
+
+                if (allFinished)
+                {
+                    FindObjectOfType<ApplicationDataScript>().evaluateGenerations();
+                }
+            }
+        }        
         
-        if(humanManager.transform.childCount == 0)
-        {
-            running = false;
-
-
-            //while (wolfManager.transform.childCount > 0)
-            //{
-            //    Destroy(wolfManager.transform.GetChild(0).gameObject);
-            //}
-            //while (bushManager.transform.childCount > 0)
-            //{
-            //    Destroy(bushManager.transform.GetChild(0).gameObject);
-            //}
-            Debug.Log("Simulation ran for " + simulationLife.ToString() + " seconds.");
-            //printHumanAttributes();
-        }
         
     }
 
     void printHumanAttributes()
     {
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < humanManager.HumansToSpawn; i++)
         {
+            //add simulation fitness
+            simulationfitness += groupAttributes.humans[i].individualFitness;
+            if (groupAttributes.humans[i].alive) { simulationfitness += 300; }
+
             Debug.Log("   Human " + i.ToString() + " attributes were:\n " +
-                      "      ATT:"+humans[i].attributes.attackPP.ToString()+ "  HP:" + humans[i].attributes.healthPP.ToString()+ "  MS:" +humans[i].attributes.moveSpeedPP.ToString()
-                      + "  SS:" + humans[i].attributes.stomachSizePP.ToString() + "  CR:" + humans[i].attributes.carryPP.ToString()
+                      "      ATT:"+ groupAttributes.humans[i].attackPP.ToString()+ "  HP:" + groupAttributes.humans[i].healthPP.ToString()+ "  MS:" + groupAttributes.humans[i].moveSpeedPP.ToString()
+                      + "  SS:" + groupAttributes.humans[i].stomachSizePP.ToString() + "  CR:" + groupAttributes.humans[i].carryPP.ToString()
+                      + "  \nflee chance:" + groupAttributes.humans[i].fleeChance.ToString() + "  hunt chance:" + groupAttributes.humans[i].huntChance.ToString()
+                      + "  \nEat trigger HP:" + groupAttributes.humans[i].eatingTriggerHealthPerc.ToString() + "  Eat trigger hunger:" + groupAttributes.humans[i].eatingTriggerHungerPerc.ToString()
                       );
         }
+        Debug.Log("simulation fitness was " + simulationfitness.ToString());
     }
 }

@@ -99,11 +99,13 @@ public class WolfScript : MonoBehaviour
                     health -= targetObject.GetComponent<HumanScript>().attack;
                     targetObject.GetComponent<HumanScript>().health -= attack;
 
+                    //wolf died
                     if (health <= 0)
                     {
                         HelperFunctions.spawnText(transform.position, "-" + (targetObject.GetComponent<HumanScript>().attack + health).ToString(), IconType.heart);
 
                         targetObject.GetComponent<HumanScript>().currentState = CurrentState.idle;
+                        targetObject.GetComponent<HumanScript>().attributes.wolvesKilled += 1;
 
                         this.GetComponent<SpriteRenderer>().color = new Color(1.0f, 0.5f, 0.5f);
 
@@ -125,14 +127,14 @@ public class WolfScript : MonoBehaviour
                     //death cases
                     if (targetObject.GetComponent<HumanScript>().health <= 0)
                     {
+                        HelperFunctions.spawnText(targetObject.transform.position, "-" + (attack + targetObject.GetComponent<HumanScript>().health).ToString(), IconType.heart);
                         targetObject.GetComponent<HumanScript>().dieAndRecord();
+
+                        targetObject = null;
 
                         this.currentState = CurrentState.idle;
 
-                        HelperFunctions.spawnText(targetObject.transform.position, "-" + (attack + targetObject.GetComponent<HumanScript>().health).ToString(), IconType.heart);
-
                         //write down dead human data
-                        targetObject = null;
                     }
                     else
                     {

@@ -5,13 +5,12 @@ using UnityEngine;
 
 public class HumanScript : MonoBehaviour
 {
-    //HelperFunctions
     //perk points to assign
     public int perkPoints = 100;
 
     public HelperFunctions.humanAttributes attributes;
 
-    //actual values for this object
+    //actual values for this objectd
     public float health;
     public float maxHealth;
     public float attack;
@@ -40,6 +39,10 @@ public class HumanScript : MonoBehaviour
 
     public void dieAndRecord()
     {
+        attributes.timeSurvived = this.GetComponentInParent<HumanManager>().Home.simulationLife;
+        attributes.alive = false;
+        attributes.individualFitness = attributes.timeSurvived * 10 + attributes.wolvesKilled * 50 + attributes.foodGathered;
+        this.GetComponentInParent<HumanManager>().Home.groupAttributes.addHuman(attributes);
 
         Destroy(this.gameObject);
     }
@@ -67,8 +70,13 @@ public class HumanScript : MonoBehaviour
 
                 if (HelperFunctions.goToTargetObject(this.gameObject, targetObject, moveSpeed))
                 {
+                    float foodBeforeExtract = FoodInInventory;
+
                     //attempting extracting as much food as possible
                     FoodInInventory += targetObject.GetComponent<FoodSource>().extractFood(carry - FoodInInventory);
+
+                    //record food gathered
+                    attributes.foodGathered += FoodInInventory - foodBeforeExtract;
 
                     //inventory full
                     if (FoodInInventory >= carry)
@@ -89,6 +97,8 @@ public class HumanScript : MonoBehaviour
                 if (HelperFunctions.goToTargetObject(this.gameObject,targetObject,moveSpeed))
                 {
                     //store all my food
+                    Debug.Log("stored food");
+                    HelperFunctions.spawnText(targetObject.transform.position, "+" + FoodInInventory, IconType.food);
                     targetObject.GetComponent<HomeScript>().storedFood += FoodInInventory;
                     FoodInInventory = 0;
                     currentState = CurrentState.idle;
@@ -116,11 +126,12 @@ public class HumanScript : MonoBehaviour
                         FoodEaten += hungerDiff;
                         targetObject.GetComponent<HomeScript>().storedFood -= hungerDiff;
                         HelperFunctions.spawnText(transform.position, "+" + hungerDiff, IconType.hunger);
-
+                        Debug.Log("ate to full cause hunger");
                         //if there is enough food to heal fully, do it
                         if (healthDiff < targetObject.GetComponent<HomeScript>().storedFood)
                         {
                             FoodEaten += healthDiff;
+                            Debug.Log("ate to full cause hp");
                             targetObject.GetComponent<HomeScript>().storedFood -= healthDiff;
                             currentState = CurrentState.idle;
                             HelperFunctions.spawnText(transform.position, "+" + healthDiff, IconType.heart);
@@ -128,6 +139,7 @@ public class HumanScript : MonoBehaviour
                         }
                         else //eat the rest
                         {
+                            Debug.Log("ate the rest of food for hp");
                             FoodEaten += targetObject.GetComponent<HomeScript>().storedFood;
                             HelperFunctions.spawnText(transform.position, "+" + targetObject.GetComponent<HomeScript>().storedFood, IconType.heart);
 
@@ -138,13 +150,14 @@ public class HumanScript : MonoBehaviour
                     else//else just eat all the food left
                     {
                         FoodEaten = targetObject.GetComponent<HomeScript>().storedFood;
-
+                        Debug.Log("ate the rest of food for hunger");
                         HelperFunctions.spawnText(transform.position, "+" + FoodEaten, IconType.hunger);
                         targetObject.GetComponent<HomeScript>().storedFood = 0;
                         currentState = CurrentState.idle;
                     }
 
                     HelperFunctions.spawnText(targetObject.transform.position, "-" + FoodEaten, IconType.food);
+                    
                 }
                 break;
 
@@ -195,6 +208,7 @@ public class HumanScript : MonoBehaviour
     {
         HungerHealthEatCheck();
         StateUpdate();
+        OutOfBoundsFix();
     }
 
     public void DecideFlight()
@@ -214,7 +228,7 @@ public class HumanScript : MonoBehaviour
                 //else fight back
                 currentState = CurrentState.fighting;
             }
-        }
+        } 
 
     }
 
@@ -251,6 +265,7 @@ public class HumanScript : MonoBehaviour
         if(hunger < 0)
         {
             dieAndRecord();
+            return;
         }
         //whenever not fighting or fleeing
         if (currentState != CurrentState.fighting && currentState != CurrentState.fleeing)
@@ -259,12 +274,30 @@ public class HumanScript : MonoBehaviour
             if (this.GetComponentInParent<HumanManager>().Home.storedFood > 0)
             {
                 //check if hungry/hurt enough to go eat
-                if (health < attributes.eatingTriggerHealthFlat || hunger < attributes.eatingTriggerHungerFlat)
+                if (health/maxHealth < attributes.eatingTriggerHealthPerc || hunger/stomachSize < attributes.eatingTriggerHungerPerc)
                 {
                     currentState = CurrentState.eating;
                     targetObject = this.GetComponentInParent<HumanManager>().Home.gameObject;
                 }
             }
         }
+    }
+
+    void OutOfBoundsFix()
+    {
+        Vector3 localPos = this.transform.localPosition;
+
+        if (Mathf.Abs(localPos.x) > 10)
+        {
+            localPos.x = Mathf.Abs(localPos.x) * 10 / localPos.x;
+        }
+
+        if (Mathf.Abs(localPos.y) > 10)
+        {
+            localPos.y = Mathf.Abs(localPos.y) * 10 / localPos.y;
+        }
+
+        this.transform.localPosition = localPos;
+
     }
 }
