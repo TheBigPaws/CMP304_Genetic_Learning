@@ -24,6 +24,18 @@ public class WolfManager : MonoBehaviour
         }
     }
 
+    public void ResetSim()
+    {
+        foreach(Transform child in transform)
+        {
+            Destroy(child.gameObject);
+        }
+        for (int i = 0; i < WolfToSpawn; i++)
+        {
+            spawnRandomLocWolf();
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {

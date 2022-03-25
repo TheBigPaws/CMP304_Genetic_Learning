@@ -97,7 +97,7 @@ public class HumanScript : MonoBehaviour
                 if (HelperFunctions.goToTargetObject(this.gameObject,targetObject,moveSpeed))
                 {
                     //store all my food
-                    Debug.Log("stored food");
+                    //Debug.Log("stored food");
                     HelperFunctions.spawnText(targetObject.transform.position, "+" + FoodInInventory, IconType.food);
                     targetObject.GetComponent<HomeScript>().storedFood += FoodInInventory;
                     FoodInInventory = 0;
@@ -126,12 +126,12 @@ public class HumanScript : MonoBehaviour
                         FoodEaten += hungerDiff;
                         targetObject.GetComponent<HomeScript>().storedFood -= hungerDiff;
                         HelperFunctions.spawnText(transform.position, "+" + hungerDiff, IconType.hunger);
-                        Debug.Log("ate to full cause hunger");
+                        //Debug.Log("ate to full cause hunger");
                         //if there is enough food to heal fully, do it
                         if (healthDiff < targetObject.GetComponent<HomeScript>().storedFood)
                         {
                             FoodEaten += healthDiff;
-                            Debug.Log("ate to full cause hp");
+                            //Debug.Log("ate to full cause hp");
                             targetObject.GetComponent<HomeScript>().storedFood -= healthDiff;
                             currentState = CurrentState.idle;
                             HelperFunctions.spawnText(transform.position, "+" + healthDiff, IconType.heart);
@@ -139,7 +139,7 @@ public class HumanScript : MonoBehaviour
                         }
                         else //eat the rest
                         {
-                            Debug.Log("ate the rest of food for hp");
+                            //Debug.Log("ate the rest of food for hp");
                             FoodEaten += targetObject.GetComponent<HomeScript>().storedFood;
                             HelperFunctions.spawnText(transform.position, "+" + targetObject.GetComponent<HomeScript>().storedFood, IconType.heart);
 
@@ -150,7 +150,7 @@ public class HumanScript : MonoBehaviour
                     else//else just eat all the food left
                     {
                         FoodEaten = targetObject.GetComponent<HomeScript>().storedFood;
-                        Debug.Log("ate the rest of food for hunger");
+                        //Debug.Log("ate the rest of food for hunger");
                         HelperFunctions.spawnText(transform.position, "+" + FoodEaten, IconType.hunger);
                         targetObject.GetComponent<HomeScript>().storedFood = 0;
                         currentState = CurrentState.idle;

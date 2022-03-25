@@ -8,6 +8,7 @@ public class ApplicationDataScript : MonoBehaviour
     public int generation = 0;
     public GameObject popT;
 
+    public int RandomGenerationsAmount = 2;
     public int BestGenerationStore = 3;
 
     List<HelperFunctions.HumanGroupAttributes> bestGenerations = new List<HelperFunctions.HumanGroupAttributes>();
@@ -18,6 +19,8 @@ public class ApplicationDataScript : MonoBehaviour
         for(int i = 0; i < BestGenerationStore; i++) { 
             bestGenerations.Add(new HelperFunctions.HumanGroupAttributes());
         }
+
+        
     }
     
     // Update is called once per frame
@@ -30,8 +33,14 @@ public class ApplicationDataScript : MonoBehaviour
             ElapsedTime = 0;
             Debug.Log(FindObjectsOfType<HomeScript>().Length);
         }
-    }
 
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            Debug.Log("sped up sim");
+            Time.timeScale += 1;
+            
+        }
+    }
     public void evaluateGenerations()
     {
         foreach (HomeScript child in FindObjectsOfType<HomeScript>())
@@ -41,7 +50,12 @@ public class ApplicationDataScript : MonoBehaviour
 
                 if(bestGenerations[i].groupFitness < child.groupAttributes.getGroupFitness())
                 {
+                    for(int j = BestGenerationStore - 1; j > i ; j--)
+                    {
+                        bestGenerations[j] = bestGenerations[j-1];
+                    }
                     bestGenerations[i] = child.groupAttributes;
+                    break;
                 }
             }
         }
@@ -50,6 +64,35 @@ public class ApplicationDataScript : MonoBehaviour
         for (int i = 0; i < BestGenerationStore; i++)
         {
             Debug.Log(bestGenerations[i].groupFitness);
+        }
+    }
+    public void startNextGeneration()
+    {
+        int i = 0;
+        evaluateGenerations();
+        foreach (HomeScript child in FindObjectsOfType<HomeScript>())
+        {
+            child.runningOutline.GetComponent<SpriteRenderer>().color = Color.green;
+            child.bushManager.ResetSim();
+            child.wolfManager.ResetSim();
+
+            //choose whether to use a shifted version of best fitness generations or random
+            if (i < RandomGenerationsAmount)
+            {
+                child.humanManager.spawnRandomHumans();
+                Debug.Log(child.name + " has been reset to random values");
+            }
+            else
+            {
+                int generationToUse = (i - RandomGenerationsAmount) % BestGenerationStore;
+                HelperFunctions.HumanGroupAttributes temp = bestGenerations[generationToUse];
+                temp.shiftAttributes();
+                child.humanManager.startNextGeneration(temp);
+                Debug.Log(child.name + " has been set to shifted values of generation #"+generationToUse.ToString());
+
+            }
+
+            i++;
         }
     }
 }

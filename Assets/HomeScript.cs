@@ -8,7 +8,7 @@ public class HomeScript : MonoBehaviour
     public float storedFood = 0f;
     public float simulationLife = 0f;
     public float simulationfitness = 0f;
-
+    public Transform runningOutline;
     //public List<HelperFunctions.humanAttributes> humans = new List<HelperFunctions.humanAttributes>();
     public HelperFunctions.HumanGroupAttributes groupAttributes;
     
@@ -27,14 +27,14 @@ public class HomeScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (running)
+        if (running) 
         {
            simulationLife += Time.deltaTime;
 
             if (humanManager.transform.childCount == 0)
             {
                 running = false;
-
+                runningOutline.GetComponent<SpriteRenderer>().color = Color.red;
                 Debug.Log("Simulation ran for " + simulationLife.ToString() + " seconds.");
                 printHumanAttributes();
 
@@ -49,13 +49,13 @@ public class HomeScript : MonoBehaviour
                     }
                 }
 
+                //evaluate generations and start new one
                 if (allFinished)
                 {
-                    FindObjectOfType<ApplicationDataScript>().evaluateGenerations();
+                    FindObjectOfType<ApplicationDataScript>().startNextGeneration();
                 }
             }
         }        
-        
         
     }
 

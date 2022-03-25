@@ -94,6 +94,7 @@ public static class HelperFunctions
         public int moveSpeedPP;
         public int stomachSizePP;
 
+        
         public float eatingTriggerHungerPerc;
         public float eatingTriggerHealthPerc;
         public float fleeChance;
