@@ -27,6 +27,8 @@ public class HumanManager : MonoBehaviour
             go.GetComponent<HumanScript>().attributes = groupToSpawn.humans[i];
             go.GetComponent<HumanScript>().attributes.resetData();
             go.GetComponent<HumanScript>().calculateAttributesFromPerkPoints();
+            Debug.Log(go.GetComponent<HumanScript>().attributes.individualFitness);
+            Debug.Log(go.GetComponent<HumanScript>().attributes.wolvesKilled);
 
         }
     }

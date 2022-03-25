@@ -11,6 +11,7 @@ public class WolfScript : MonoBehaviour
     public CurrentState currentState = CurrentState.idle;
     public GameObject targetObject;
 
+    float wanderRange;
 
     Vector3 wanderEndLocation;
     float waitTime;
@@ -48,7 +49,7 @@ public class WolfScript : MonoBehaviour
                     }
                     else //pick new wander end location
                     {
-                        wanderEndLocation = this.transform.parent.position + new Vector3(Random.Range(-10f, 10f), Random.Range(-2f, 10f), 0f);
+                        wanderEndLocation = this.transform.parent.position + new Vector3(Random.Range(-wanderRange, wanderRange), Random.Range(-wanderRange/5, wanderRange), 0f);
                         waitTime = Random.Range(0f, 3f);
                     }
 
@@ -108,7 +109,7 @@ public class WolfScript : MonoBehaviour
                         targetObject.GetComponent<HumanScript>().attributes.wolvesKilled += 1;
 
                         this.GetComponent<SpriteRenderer>().color = new Color(1.0f, 0.5f, 0.5f);
-
+                        this.transform.name = "WolfCorpse";
                         //make this object into a food source
                         this.gameObject.AddComponent<FoodSource>();
                         this.gameObject.GetComponent<FoodSource>().FoodAmount = 60;
@@ -172,7 +173,8 @@ public class WolfScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        wanderEndLocation = this.transform.parent.position + new Vector3(Random.Range(-10f, 10f), Random.Range(-2f, 10f), 0f); ;
+        wanderRange = transform.parent.parent.localScale.x / 2;
+        wanderEndLocation = this.transform.parent.position + new Vector3(Random.Range(-wanderRange, wanderRange), Random.Range(-wanderRange/5, wanderRange), 0f); ;
     }
 
     // Update is called once per frame

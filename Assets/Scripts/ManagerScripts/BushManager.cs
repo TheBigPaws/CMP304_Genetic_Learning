@@ -12,7 +12,9 @@ public class BushManager : MonoBehaviour
     public void spawnRandomLocBush()
     {
         GameObject go = Instantiate(BushRef, this.transform);
-        go.transform.position = this.transform.position + new Vector3(Random.Range(-10f, 10f), Random.Range(-10f, 10f), 0f);
+
+        float spawnRange = transform.parent.localScale.x / 2;
+        go.transform.position = this.transform.position + new Vector3(Random.Range(-spawnRange, spawnRange), Random.Range(-spawnRange, spawnRange), 0f);
 
     }
 

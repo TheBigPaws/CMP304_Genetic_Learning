@@ -12,7 +12,8 @@ public class WolfManager : MonoBehaviour
 
     public void spawnRandomLocWolf()
     {
-        Instantiate(WolfRef, this.transform).transform.position = this.transform.position + new Vector3(Random.Range(-10f, 10f), Random.Range(-2f, 10f), 0f);
+        float spawnRange = transform.parent.localScale.x / 2;
+        Instantiate(WolfRef, this.transform).transform.position = this.transform.position + new Vector3(Random.Range(-spawnRange, spawnRange), Random.Range(-spawnRange/5, spawnRange), 0f);
     }
 
     // Start is called before the first frame update

@@ -13,9 +13,12 @@ public static class HelperFunctions
 
     public static void spawnText(Vector3 position, string text, IconType type)
     {
-        GameObject a = MonoBehaviour.Instantiate(Transform.FindObjectOfType<ApplicationDataScript>().popT);
-        a.transform.position = position;
-        a.GetComponent<PopupTextScript>().Setup(text, type);
+        if (Transform.FindObjectOfType<UI_script>().spawnPopupUI.isOn)
+        {
+            GameObject a = MonoBehaviour.Instantiate(Transform.FindObjectOfType<ApplicationDataScript>().popT);
+            a.transform.position = position;
+            a.GetComponent<PopupTextScript>().Setup(text, type);
+        }
     }
 
     //returns true if its arrived
@@ -108,7 +111,7 @@ public static class HelperFunctions
         timeSurvived = 0;
         foodGathered = 0;
         wolvesKilled = 0;
-    }
+        }
 
         public void shuffleAttributes()
         {

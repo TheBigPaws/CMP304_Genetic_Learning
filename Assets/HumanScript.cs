@@ -18,6 +18,9 @@ public class HumanScript : MonoBehaviour
     public float moveSpeed;
     public float stomachSize;
 
+    public float percToHeal;
+    public float percToEat;
+
     //behaviour variables
     public CurrentState currentState = CurrentState.idle;
     public GameObject targetObject;
@@ -41,7 +44,8 @@ public class HumanScript : MonoBehaviour
     {
         attributes.timeSurvived = this.GetComponentInParent<HumanManager>().Home.simulationLife;
         attributes.alive = false;
-        attributes.individualFitness = attributes.timeSurvived * 10 + attributes.wolvesKilled * 50 + attributes.foodGathered;
+        //attributes.individualFitness = attributes.timeSurvived * 10 + attributes.wolvesKilled * 50 + attributes.foodGathered;
+        attributes.individualFitness = attributes.wolvesKilled;
         this.GetComponentInParent<HumanManager>().Home.groupAttributes.addHuman(attributes);
 
         Destroy(this.gameObject);
@@ -54,6 +58,15 @@ public class HumanScript : MonoBehaviour
         if (!targetObject && currentState != CurrentState.idle)
         {
             currentState = CurrentState.idle;
+        }
+
+        //only on idle should there be no targetObject
+        if (currentState == CurrentState.hunting || currentState == CurrentState.fleeing)
+        {
+            if(targetObject.name == "WolfCorpse")
+            {
+                currentState = CurrentState.idle;
+            }
         }
 
         switch (currentState)
@@ -168,7 +181,10 @@ public class HumanScript : MonoBehaviour
                 {
 
                 }
-
+                if(targetObject.GetComponent<WolfScript>() == null)
+                {
+                    currentState = CurrentState.idle;
+                }
                 break;
 
             //----------------------------------FLEEING:
@@ -189,13 +205,30 @@ public class HumanScript : MonoBehaviour
                 }
 
                 break;
+
+            //----------------------------------FIGHTING:
+            case CurrentState.fighting:
+
+
+                //run direction away from targetObject
+                Vector3 direction_ = this.transform.position - targetObject.transform.position;
+                float distance_ = direction_.magnitude;
+
+                //if run far enough, back to idle
+                if (distance_ >= 2)
+                {
+                    currentState = CurrentState.idle;
+                }
+
+                break;
         }
     }
 
     // Start is called before the first frame update
     void Start()
     {
-       
+        percToEat = attributes.eatingTriggerHungerPerc;
+        percToHeal = attributes.eatingTriggerHealthPerc;
     }
 
     // Update is called once per frame
@@ -287,14 +320,14 @@ public class HumanScript : MonoBehaviour
     {
         Vector3 localPos = this.transform.localPosition;
 
-        if (Mathf.Abs(localPos.x) > 10)
+        if (Mathf.Abs(localPos.x) > 0.5f)
         {
-            localPos.x = Mathf.Abs(localPos.x) * 10 / localPos.x;
+            localPos.x = Mathf.Abs(localPos.x) * 0.5f / localPos.x;
         }
 
-        if (Mathf.Abs(localPos.y) > 10)
+        if (Mathf.Abs(localPos.y) > 0.5f)
         {
-            localPos.y = Mathf.Abs(localPos.y) * 10 / localPos.y;
+            localPos.y = Mathf.Abs(localPos.y) * 0.5f / localPos.y;
         }
 
         this.transform.localPosition = localPos;

@@ -28,18 +28,9 @@ public class ApplicationDataScript : MonoBehaviour
     {
         ElapsedTime += Time.deltaTime;
 
-        if(ElapsedTime > 10)
-        {
-            ElapsedTime = 0;
-            Debug.Log(FindObjectsOfType<HomeScript>().Length);
-        }
+        
 
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            Debug.Log("sped up sim");
-            Time.timeScale += 1;
-            
-        }
+
     }
     public void evaluateGenerations()
     {
@@ -63,7 +54,7 @@ public class ApplicationDataScript : MonoBehaviour
             Debug.Log("Best group fitnesses were");
         for (int i = 0; i < BestGenerationStore; i++)
         {
-            Debug.Log(bestGenerations[i].groupFitness);
+            Debug.Log((1+i).ToString() +": "+ bestGenerations[i].groupFitness.ToString());
         }
     }
     public void startNextGeneration()
@@ -72,15 +63,15 @@ public class ApplicationDataScript : MonoBehaviour
         evaluateGenerations();
         foreach (HomeScript child in FindObjectsOfType<HomeScript>())
         {
-            child.runningOutline.GetComponent<SpriteRenderer>().color = Color.green;
-            child.bushManager.ResetSim();
-            child.wolfManager.ResetSim();
+
+
+            child.resetSim();
 
             //choose whether to use a shifted version of best fitness generations or random
             if (i < RandomGenerationsAmount)
             {
                 child.humanManager.spawnRandomHumans();
-                Debug.Log(child.name + " has been reset to random values");
+                //Debug.Log(child.name + " has been reset to random values");
             }
             else
             {
@@ -88,7 +79,7 @@ public class ApplicationDataScript : MonoBehaviour
                 HelperFunctions.HumanGroupAttributes temp = bestGenerations[generationToUse];
                 temp.shiftAttributes();
                 child.humanManager.startNextGeneration(temp);
-                Debug.Log(child.name + " has been set to shifted values of generation #"+generationToUse.ToString());
+                //Debug.Log(child.name + " has been set to shifted values of generation #"+generationToUse.ToString());
 
             }
 

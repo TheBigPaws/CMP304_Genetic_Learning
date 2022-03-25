@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class SimulationData : MonoBehaviour
+public class TimeSliderScript : MonoBehaviour
 {
+
     // Start is called before the first frame update
     void Start()
     {
@@ -15,4 +17,6 @@ public class SimulationData : MonoBehaviour
     {
         
     }
+
+    
 }

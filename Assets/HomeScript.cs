@@ -35,8 +35,8 @@ public class HomeScript : MonoBehaviour
             {
                 running = false;
                 runningOutline.GetComponent<SpriteRenderer>().color = Color.red;
-                Debug.Log("Simulation ran for " + simulationLife.ToString() + " seconds.");
-                printHumanAttributes();
+                //Debug.Log("Simulation ran for " + simulationLife.ToString() + " seconds.");
+                //printHumanAttributes();
 
 
                 bool allFinished = true;
@@ -59,21 +59,13 @@ public class HomeScript : MonoBehaviour
         
     }
 
-    void printHumanAttributes()
-    {
-        for (int i = 0; i < humanManager.HumansToSpawn; i++)
-        {
-            //add simulation fitness
-            simulationfitness += groupAttributes.humans[i].individualFitness;
-            if (groupAttributes.humans[i].alive) { simulationfitness += 300; }
 
-            Debug.Log("   Human " + i.ToString() + " attributes were:\n " +
-                      "      ATT:"+ groupAttributes.humans[i].attackPP.ToString()+ "  HP:" + groupAttributes.humans[i].healthPP.ToString()+ "  MS:" + groupAttributes.humans[i].moveSpeedPP.ToString()
-                      + "  SS:" + groupAttributes.humans[i].stomachSizePP.ToString() + "  CR:" + groupAttributes.humans[i].carryPP.ToString()
-                      + "  \nflee chance:" + groupAttributes.humans[i].fleeChance.ToString() + "  hunt chance:" + groupAttributes.humans[i].huntChance.ToString()
-                      + "  \nEat trigger HP:" + groupAttributes.humans[i].eatingTriggerHealthPerc.ToString() + "  Eat trigger hunger:" + groupAttributes.humans[i].eatingTriggerHungerPerc.ToString()
-                      );
-        }
-        Debug.Log("simulation fitness was " + simulationfitness.ToString());
+    public void resetSim()
+    {
+        runningOutline.GetComponent<SpriteRenderer>().color = Color.green;
+        bushManager.ResetSim();
+        wolfManager.ResetSim();
+        running = true;
+        simulationLife = 0.0f;
     }
 }
