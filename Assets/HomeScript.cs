@@ -12,7 +12,7 @@ public class HomeScript : MonoBehaviour
     //public List<HelperFunctions.humanAttributes> humans = new List<HelperFunctions.humanAttributes>();
     public HelperFunctions.HumanGroupAttributes groupAttributes;
     
-    bool running = true;
+    public bool running = true;
 
     public HumanManager humanManager;
     public WolfManager wolfManager;
@@ -35,25 +35,6 @@ public class HomeScript : MonoBehaviour
             {
                 running = false;
                 runningOutline.GetComponent<SpriteRenderer>().color = Color.red;
-                //Debug.Log("Simulation ran for " + simulationLife.ToString() + " seconds.");
-                //printHumanAttributes();
-
-
-                bool allFinished = true;
-
-                foreach(HomeScript child in FindObjectsOfType<HomeScript>())
-                {
-                    if (child.running)
-                    {
-                        allFinished = false;
-                    }
-                }
-
-                //evaluate generations and start new one
-                if (allFinished)
-                {
-                    FindObjectOfType<ApplicationDataScript>().startNextGeneration();
-                }
             }
         }        
         
@@ -63,6 +44,7 @@ public class HomeScript : MonoBehaviour
     public void resetSim()
     {
         runningOutline.GetComponent<SpriteRenderer>().color = Color.green;
+        //groupAttributes.humans.Clear();
         bushManager.ResetSim();
         wolfManager.ResetSim();
         running = true;

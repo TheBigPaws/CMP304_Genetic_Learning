@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class UI_script : MonoBehaviour
 {
@@ -9,11 +10,14 @@ public class UI_script : MonoBehaviour
     public Toggle spawnPopupUI;
     public Toggle toggleAllUI;
     public Image allPanel;
+    public TextMeshProUGUI GenerationCount;
+    
    // bool spawnPopupUI = true;
     public void changeSimulationSpeed()
     {
         Time.timeScale = sliderRef.value;
     }
+
 
     public void toggleDisplayUI()
     {

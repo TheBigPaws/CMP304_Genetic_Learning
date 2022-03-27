@@ -20,15 +20,14 @@ public class HumanManager : MonoBehaviour
 
     public void startNextGeneration(HelperFunctions.HumanGroupAttributes groupToSpawn)
     {
-        for (int i = 0; i < HumansToSpawn; i++)
+        for (int i = 0; i < groupToSpawn.humans.Count; i++)
         {
             GameObject go = Instantiate(HumanRef, this.transform);
             go.transform.position = Home.transform.position;
             go.GetComponent<HumanScript>().attributes = groupToSpawn.humans[i];
             go.GetComponent<HumanScript>().attributes.resetData();
             go.GetComponent<HumanScript>().calculateAttributesFromPerkPoints();
-            Debug.Log(go.GetComponent<HumanScript>().attributes.individualFitness);
-            Debug.Log(go.GetComponent<HumanScript>().attributes.wolvesKilled);
+
 
         }
     }

@@ -49,7 +49,7 @@ public static class HelperFunctions
 
     public struct HumanGroupAttributes
     {
-        public float groupFitness;
+        //public float groupFitness;
         public List<HelperFunctions.humanAttributes> humans;
         public float getGroupFitness()
         {
@@ -61,7 +61,7 @@ public static class HelperFunctions
                 if (child.alive) { Gfitness += 300; }
 
             }
-            groupFitness = Gfitness;
+            //groupFitness = Gfitness;
             return Gfitness;
         }
         public void setup()
