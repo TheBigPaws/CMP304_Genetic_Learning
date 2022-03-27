@@ -40,12 +40,13 @@ public class HumanScript : MonoBehaviour
         hunger = stomachSize;
     }
 
+
+
     public void dieAndRecord()
     {
         attributes.timeSurvived = this.GetComponentInParent<HumanManager>().Home.simulationLife;
         attributes.alive = false;
-        //attributes.individualFitness = attributes.timeSurvived * 10 + attributes.wolvesKilled * 50 + attributes.foodGathered;
-        attributes.individualFitness = attributes.wolvesKilled;
+        attributes.calculateFitness();
         this.GetComponentInParent<HumanManager>().Home.groupAttributes.addHuman(attributes);
 
         Destroy(this.gameObject);

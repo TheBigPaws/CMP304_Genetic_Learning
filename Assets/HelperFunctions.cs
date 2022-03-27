@@ -51,21 +51,22 @@ public static class HelperFunctions
     {
         //public float groupFitness;
         public List<HelperFunctions.humanAttributes> humans;
-        public float getGroupFitness()
+        public float GroupFitness;
+        public float CalculateGroupFitness()
         {
-            float Gfitness = 0;
-
+            GroupFitness = 0;
             foreach(HelperFunctions.humanAttributes child in humans)
             {
-                Gfitness += child.individualFitness;
-                if (child.alive) { Gfitness += 300; }
-
+                GroupFitness += child.individualFitness;
+                //if (child.alive) { Gfitness += 300; }
+            
             }
             //groupFitness = Gfitness;
-            return Gfitness;
+            return GroupFitness;
         }
         public void setup()
         {
+            GroupFitness = 0;
             humans = new List<humanAttributes>();
         }
         public void addHuman(HelperFunctions.humanAttributes attributes)
@@ -86,22 +87,31 @@ public static class HelperFunctions
     {
         public bool alive;
 
-        public float individualFitness;
-        public float timeSurvived;
-        public float foodGathered;
-        public int wolvesKilled;
-
+        
+        //perk point attributes
         public int healthPP;
         public int attackPP;
         public int carryPP;
         public int moveSpeedPP;
         public int stomachSizePP;
 
-        
+        //behaviour preference
         public float eatingTriggerHungerPerc;
         public float eatingTriggerHealthPerc;
         public float fleeChance;
         public float huntChance;
+
+        //fitness variables
+        public float individualFitness;
+        public float timeSurvived;
+        public float foodGathered;
+        public int wolvesKilled;
+
+        public void calculateFitness()
+        {
+            //attributes.individualFitness = attributes.timeSurvived * 10 + attributes.wolvesKilled * 50 + attributes.foodGathered;
+            individualFitness = wolvesKilled;
+        }
 
         public void resetData()
         {
@@ -207,6 +217,8 @@ public static class HelperFunctions
             huntChance = Random.Range(0.0f, 1.0f);
             fleeChance = Random.Range(0.0f, 1.0f);
         }
+
+        
     }
 
 }

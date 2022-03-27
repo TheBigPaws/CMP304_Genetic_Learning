@@ -15,8 +15,12 @@ public class ApplicationDataScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        for(int i = 0; i < BestGenerationStore; i++) { 
-            bestGenerations.Add(new HelperFunctions.HumanGroupAttributes());
+        for(int i = 0; i < BestGenerationStore; i++) {
+            HelperFunctions.HumanGroupAttributes temp = new HelperFunctions.HumanGroupAttributes();
+            temp.setup();
+            bestGenerations.Add(temp);
+            //bestGenerations.
+            //Debug.Log(bestGenerations[i].getGroupFitness());
         }
 
         
@@ -37,6 +41,7 @@ public class ApplicationDataScript : MonoBehaviour
                 allFinished = false;
                 break;
             }
+            //else { Debug.Log(child.groupAttributes.humans.Count); }
         }
 
         //evaluate generations and start new one
@@ -48,49 +53,47 @@ public class ApplicationDataScript : MonoBehaviour
     }
     public void evaluateGenerations()
     {
-        //go thru all homes in scene
         foreach (HomeScript child in FindObjectsOfType<HomeScript>())
         {
+            child.groupAttributes.CalculateGroupFitness();
             for (int i = 0; i < BestGenerationStore; i++)
             {
-                //if given home is better than one of stored values
-                if(bestGenerations[i].getGroupFitness() < child.groupAttributes.getGroupFitness())
+        
+                if (bestGenerations[i].GroupFitness < child.groupAttributes.GroupFitness)
                 {
-                    //shift everything to the right
-                    for(int j = BestGenerationStore - 1; j > i ; j--)
+
+                    Debug.Log("replacing generation rank " + (i + 1).ToString() + "with fitness " + bestGenerations[i].GroupFitness.ToString() + "with fitness " + child.groupAttributes.GroupFitness.ToString());
+
+                    //shift everything to the right 
+                    for (int j = BestGenerationStore - 1; j > i; j--)
                     {
-                        bestGenerations[j] = bestGenerations[j-1];
+                        bestGenerations[j] = bestGenerations[j - 1];
                     }
-                    //assign new bestGenValue
+
                     bestGenerations[i] = child.groupAttributes;
                     break;
                 }
             }
         }
 
-            Debug.Log("Best group fitnesses were");
+        Debug.Log("Best group fitnesses were");
         for (int i = 0; i < BestGenerationStore; i++)
         {
-            Debug.Log((1+i).ToString() +": "+ bestGenerations[i].getGroupFitness().ToString());
+            Debug.Log(bestGenerations[i].GroupFitness);
         }
     }
     public void startNextGeneration()
     {
         int i = 0;
-        generation++;
-        //FindObjectOfType<UI_script>().GenerationCount.text = "Generation " + generation.ToString();
         evaluateGenerations();
         foreach (HomeScript child in FindObjectsOfType<HomeScript>())
         {
-
-
             child.resetSim();
 
             //choose whether to use a shifted version of best fitness generations or random
             if (i < RandomGenerationsAmount)
             {
                 child.humanManager.spawnRandomHumans();
-                //Debug.Log(child.name + " has been reset to random values");
             }
             else
             {
@@ -98,8 +101,6 @@ public class ApplicationDataScript : MonoBehaviour
                 HelperFunctions.HumanGroupAttributes temp = bestGenerations[generationToUse];
                 temp.shiftAttributes();
                 child.humanManager.startNextGeneration(temp);
-                //Debug.Log(child.name + " has been set to shifted values of generation #"+generationToUse.ToString());
-
             }
 
             i++;
