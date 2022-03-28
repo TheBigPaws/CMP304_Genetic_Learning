@@ -45,10 +45,10 @@ public class HumanScript : MonoBehaviour
 
 
 
-    public void dieAndRecord()
+    public void endSimRecord(bool alive)
     {
         attributes.timeSurvived = this.GetComponentInParent<HumanManager>().Home.simulationLife;
-        attributes.alive = false;
+        attributes.alive = alive;
         attributes.calculateFitness();
         this.GetComponentInParent<HumanManager>().Home.groupAttributes.addHuman(attributes);
 
@@ -322,7 +322,7 @@ public class HumanScript : MonoBehaviour
         //death case
         if(hunger <= 0 || health <=0)
         {
-            dieAndRecord();
+            endSimRecord(false);
             return;
         }
 

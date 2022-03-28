@@ -231,23 +231,24 @@ public static class HelperFunctions
 
     public static HumanGroupAttributes CombineGenerations(HumanGroupAttributes GenerationA, HumanGroupAttributes GenerationB)
     {
-        //Debug.Log("Generation A members: " + GenerationA.humans.Count);
+        Debug.Log("Generation A members B4 set: " + GenerationA.humans.Count);
 
         for (int i = 0; i < GenerationA.humans.Count; i++)
         {
-            //Debug.Log(i.ToString() + ", ID: " + GenerationA.humans[i].ID.ToString());
+            Debug.Log(i.ToString() + ", ID: " + GenerationA.humans[i].ID.ToString());
         }
 
-        //for(int i = 0; i < 2; i++)
-        //{
-        //    //randomly get some of their humans
-        //    GenerationA.humans[Random.Range(0, GenerationA.humans.Count)] = GenerationB.humans[Random.Range(0, GenerationB.humans.Count)];
-        //
-        //    for (int o = 0; o < GenerationA.humans.Count; o++)
-        //    {
-        //        Debug.Log(o.ToString() + ": " + GenerationA.humans[o].individualFitness.ToString());
-        //    }
-        //}
+        for(int i = 0; i < 2; i++)
+        {
+            //randomly get some of their humans
+            GenerationA.humans[Random.Range(0, GenerationA.humans.Count)] = GenerationB.humans[Random.Range(0, GenerationB.humans.Count)];
+
+            Debug.Log("Generation A members AFTER set: " + GenerationA.humans.Count);
+            for (int o = 0; o < GenerationA.humans.Count; o++)
+            {
+                Debug.Log(o.ToString() + ", ID: " + GenerationA.humans[o].ID.ToString());
+            }
+        }
 
         HumanGroupAttributes temp = GenerationA;
         return temp;

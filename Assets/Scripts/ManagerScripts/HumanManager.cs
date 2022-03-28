@@ -16,7 +16,7 @@ public class HumanManager : MonoBehaviour
     void Start()
     {
         spawnRandomHumans();
-        Debug.Log("HTS=" + HumansToSpawn.ToString());
+        //Debug.Log("HTS=" + HumansToSpawn.ToString());
     }
 
     public void startNextGeneration(HelperFunctions.HumanGroupAttributes groupToSpawn)

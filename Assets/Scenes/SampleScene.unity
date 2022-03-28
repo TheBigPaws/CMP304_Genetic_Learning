@@ -1218,7 +1218,7 @@ MonoBehaviour:
   ElapsedTime: 0
   generation: 0
   popT: {fileID: 4683142139878875078, guid: 67d7d82d537329941a1b4999aad4e1e9, type: 3}
-  RandomGenerationsAmount: 5
+  RandomGenerationsAmount: 9
   BestGenerationStore: 3
 --- !u!4 &873505237
 Transform:

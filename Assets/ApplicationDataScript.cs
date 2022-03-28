@@ -7,8 +7,8 @@ public class ApplicationDataScript : MonoBehaviour
     public int generation;
     public GameObject popT;
 
-    public int RandomGenerationsAmount = 5;
-    public int BestGenerationStore = 4;
+    public int RandomGenerationsAmount = 10;
+    public int BestGenerationStore = 5;
 
     List<HelperFunctions.HumanGroupAttributes> bestGenerations = new List<HelperFunctions.HumanGroupAttributes>();
 
@@ -94,13 +94,13 @@ public class ApplicationDataScript : MonoBehaviour
             }
         }
 
-        //Debug.Log("Best group fitnesses AFTER EVALUATE were");
-        //for (int i = 0; i < BestGenerationStore; i++)
-        //{
-        //
-        //    Debug.Log(bestGenerations[i].GroupFitness);
-        //    Debug.Log("humanCount is " + bestGenerations[i].humans.Count.ToString());
-        //}
+        Debug.Log("Best group fitnesses AFTER EVALUATE were");
+        for (int i = 0; i < BestGenerationStore; i++)
+        {
+        
+            Debug.Log(bestGenerations[i].GroupFitness);
+            //Debug.Log("humanCount is " + bestGenerations[i].humans.Count.ToString());
+        }
     }
     public void startNextGeneration()
     {
@@ -125,9 +125,16 @@ public class ApplicationDataScript : MonoBehaviour
             else
             {
 
+                int genAidx = 0;
+                int genBidx = 0;
 
-                int generationToUse = (randGenCount - RandomGenerationsAmount) % BestGenerationStore;
-                HelperFunctions.HumanGroupAttributes temp = bestGenerations[generationToUse];
+                while(genAidx == genBidx)
+                {
+                    genAidx = Random.Range(0, bestGenerations.Count);
+                    genBidx = Random.Range(0, bestGenerations.Count);
+                }
+
+                HelperFunctions.HumanGroupAttributes temp = HelperFunctions.CombineGenerations(bestGenerations[genAidx], bestGenerations[genBidx]);
 
                 temp.shiftAttributes();
 
