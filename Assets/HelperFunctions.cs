@@ -15,11 +15,14 @@ public static class HelperFunctions
     {
         if (Transform.FindObjectOfType<UI_script>().spawnPopupUI.isOn)
         {
-            GameObject a = MonoBehaviour.Instantiate(Transform.FindObjectOfType<ApplicationDataScript>().popT);
+            ApplicationDataScript appData = Transform.FindObjectOfType<ApplicationDataScript>();
+            GameObject a = MonoBehaviour.Instantiate(appData.popT, appData.transform);
             a.transform.position = position;
             a.GetComponent<PopupTextScript>().Setup(text, type);
         }
     }
+
+
 
     //returns true if its arrived
     public static bool goToTargetObject(GameObject subject, GameObject targetObject, float moveSpeed)
@@ -71,7 +74,10 @@ public static class HelperFunctions
         }
         public void addHuman(HelperFunctions.humanAttributes attributes)
         {
+
+            HelperFunctions.humanAttributes temp = attributes;
             humans.Add(attributes);
+            //humans.pu
         }
         public void shiftAttributes()
         {
@@ -87,6 +93,7 @@ public static class HelperFunctions
     {
         public bool alive;
 
+        public int ID;
         
         //perk point attributes
         public int healthPP;
@@ -109,8 +116,8 @@ public static class HelperFunctions
 
         public void calculateFitness()
         {
-            //attributes.individualFitness = attributes.timeSurvived * 10 + attributes.wolvesKilled * 50 + attributes.foodGathered;
-            individualFitness = wolvesKilled;
+            individualFitness = timeSurvived * 10 + wolvesKilled * 50 + foodGathered*2;
+            //individualFitness = wolvesKilled;
         }
 
         public void resetData()
@@ -165,6 +172,8 @@ public static class HelperFunctions
 
         void spendPoints(int pointsToSpend)
         {
+            ID = Random.Range(0, 1000);
+
             int PPleftToSpend = pointsToSpend;
 
             while (PPleftToSpend > 0)
@@ -198,7 +207,6 @@ public static class HelperFunctions
         public void setRandom(int perkPoints)
         {
             resetData();
-            int PPleftToSpend = perkPoints;
 
             healthPP = 1;
             attackPP = 1;
@@ -219,6 +227,30 @@ public static class HelperFunctions
         }
 
         
+    }
+
+    public static HumanGroupAttributes CombineGenerations(HumanGroupAttributes GenerationA, HumanGroupAttributes GenerationB)
+    {
+        //Debug.Log("Generation A members: " + GenerationA.humans.Count);
+
+        for (int i = 0; i < GenerationA.humans.Count; i++)
+        {
+            //Debug.Log(i.ToString() + ", ID: " + GenerationA.humans[i].ID.ToString());
+        }
+
+        //for(int i = 0; i < 2; i++)
+        //{
+        //    //randomly get some of their humans
+        //    GenerationA.humans[Random.Range(0, GenerationA.humans.Count)] = GenerationB.humans[Random.Range(0, GenerationB.humans.Count)];
+        //
+        //    for (int o = 0; o < GenerationA.humans.Count; o++)
+        //    {
+        //        Debug.Log(o.ToString() + ": " + GenerationA.humans[o].individualFitness.ToString());
+        //    }
+        //}
+
+        HumanGroupAttributes temp = GenerationA;
+        return temp;
     }
 
 }

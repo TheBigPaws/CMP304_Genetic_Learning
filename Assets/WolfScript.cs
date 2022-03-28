@@ -97,7 +97,7 @@ public class WolfScript : MonoBehaviour
                 {
                     //reset attack time and deal damage to both
                     attackTime = 1;
-                    health -= targetObject.GetComponent<HumanScript>().attack;
+                    //health -= targetObject.GetComponent<HumanScript>().attack;
                     targetObject.GetComponent<HumanScript>().health -= attack;
 
                     //wolf died
@@ -129,10 +129,9 @@ public class WolfScript : MonoBehaviour
                     if (targetObject.GetComponent<HumanScript>().health <= 0)
                     {
                         HelperFunctions.spawnText(targetObject.transform.position, "-" + (attack + targetObject.GetComponent<HumanScript>().health).ToString(), IconType.heart);
-                        targetObject.GetComponent<HumanScript>().dieAndRecord();
+                        targetObject.GetComponent<HumanScript>().attributes.alive = false;
 
                         targetObject = null;
-
                         this.currentState = CurrentState.idle;
 
                         //write down dead human data
@@ -148,26 +147,37 @@ public class WolfScript : MonoBehaviour
 
     void CheckForNearbyHumans()
     {
-        bool ret = false;
         for (int i = 0; i < this.GetComponentInParent<WolfManager>().humanManager.transform.childCount; i++)
         {
 
             GameObject tempGOholder = this.GetComponentInParent<WolfManager>().humanManager.transform.GetChild(i).gameObject;
             
-            if(Vector3.Distance(this.transform.position,tempGOholder.transform.position) < 3)
+            if(Vector3.Distance(this.transform.position,tempGOholder.transform.position) < 3 && tempGOholder.GetComponent<HumanScript>().attributes.alive)
             {
                 targetObject = tempGOholder;
                 currentState = CurrentState.hunting;
                 targetObject.GetComponent<HumanScript>().DecideFlight();
+                targetObject.GetComponent<HumanScript>().targetObject = this.gameObject;
 
-                ret = true;
             }
 
         }
-        if (ret)
-        {
-            targetObject.GetComponent<HumanScript>().targetObject = this.gameObject;
-        }
+
+    }
+
+    public void WolfDeath()
+    {
+        this.GetComponent<SpriteRenderer>().color = new Color(1.0f, 0.5f, 0.5f);
+        this.transform.name = "WolfCorpse";
+        //make this object into a food source
+        this.gameObject.AddComponent<FoodSource>();
+        this.gameObject.GetComponent<FoodSource>().FoodAmount = 60;
+
+        this.GetComponentInParent<WolfManager>().spawnRandomLocWolf();
+
+        this.gameObject.transform.SetParent(this.GetComponentInParent<WolfManager>().humanManager.bushManager.transform);
+        //spawn a new wolf
+        Destroy(this);
     }
 
     // Start is called before the first frame update

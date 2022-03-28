@@ -44,7 +44,6 @@ public class HomeScript : MonoBehaviour
     public void resetSim()
     {
         runningOutline.GetComponent<SpriteRenderer>().color = Color.green;
-        groupAttributes.humans.Clear();
         groupAttributes.setup();
         bushManager.ResetSim();
         wolfManager.ResetSim();

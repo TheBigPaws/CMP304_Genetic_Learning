@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class HumanScript : MonoBehaviour
 {
+
+
     //perk points to assign
     public int perkPoints = 100;
 
@@ -28,6 +30,7 @@ public class HumanScript : MonoBehaviour
     public float hunger;
     public float FoodInInventory;
 
+    float attackTime = 0.0f;
 
     public void calculateAttributesFromPerkPoints()
     {
@@ -62,10 +65,11 @@ public class HumanScript : MonoBehaviour
         }
 
         //only on idle should there be no targetObject
-        if (currentState == CurrentState.hunting || currentState == CurrentState.fleeing)
+        if (currentState == CurrentState.hunting || currentState == CurrentState.fleeing || currentState == CurrentState.fighting)
         {
-            if(targetObject.name == "WolfCorpse")
+            if(targetObject.name != "Wolf(Clone)")
             {
+                //Debug.Log("strudel");
                 currentState = CurrentState.idle;
             }
         }
@@ -210,17 +214,33 @@ public class HumanScript : MonoBehaviour
             //----------------------------------FIGHTING:
             case CurrentState.fighting:
 
-
-                //run direction away from targetObject
-                Vector3 direction_ = this.transform.position - targetObject.transform.position;
-                float distance_ = direction_.magnitude;
-
-                //if run far enough, back to idle
-                if (distance_ >= 2)
+                if (attackTime > 0) //wait for next hit
                 {
-                    currentState = CurrentState.idle;
-                }
+                    attackTime -= Time.deltaTime;
 
+                }
+                else
+                {
+                    //reset attack time and deal damage to both
+                    attackTime = 1;
+                    //health -= targetObject.GetComponent<HumanScript>().attack;
+                    targetObject.GetComponent<WolfScript>().health -= attack;
+
+                    //wolf died
+                    if (targetObject.GetComponent<WolfScript>().health <= 0)
+                    {
+                        HelperFunctions.spawnText(transform.position, "-" + (attack + targetObject.GetComponent<WolfScript>().health).ToString(), IconType.heart);
+
+                        currentState = CurrentState.idle;
+                        attributes.wolvesKilled += 1;
+
+                        targetObject.GetComponent<WolfScript>().WolfDeath();
+                    }
+                    else
+                    {
+                        HelperFunctions.spawnText(transform.position, "-" + (attack).ToString(), IconType.heart);
+                    }
+                }
                 break;
         }
     }
@@ -230,6 +250,8 @@ public class HumanScript : MonoBehaviour
     {
         percToEat = attributes.eatingTriggerHungerPerc;
         percToHeal = attributes.eatingTriggerHealthPerc;
+
+        
     }
 
     // Update is called once per frame
@@ -248,6 +270,7 @@ public class HumanScript : MonoBehaviour
     public void DecideFlight()
     {
         //random float to decide
+
         float choiceFloat = Random.Range(0.0f, 1.0f);
 
         if(currentState != CurrentState.fighting && currentState != CurrentState.fleeing)
@@ -296,11 +319,14 @@ public class HumanScript : MonoBehaviour
         //decrement hunger
         hunger -= Time.deltaTime;
 
-        if(hunger < 0)
+        //death case
+        if(hunger <= 0 || health <=0)
         {
             dieAndRecord();
             return;
         }
+
+
         //whenever not fighting or fleeing
         if (currentState != CurrentState.fighting && currentState != CurrentState.fleeing)
         {
