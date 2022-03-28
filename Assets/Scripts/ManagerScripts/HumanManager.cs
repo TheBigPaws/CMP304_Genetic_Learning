@@ -44,6 +44,7 @@ public class HumanManager : MonoBehaviour
             go.GetComponent<HumanScript>().calculateAttributesFromPerkPoints();
 
         }
+        Home.runningOutline.GetComponent<SpriteRenderer>().color = Color.yellow;
     }
     // Update is called once per frame
     void Update()

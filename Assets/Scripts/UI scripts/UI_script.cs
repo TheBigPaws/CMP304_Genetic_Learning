@@ -11,6 +11,8 @@ public class UI_script : MonoBehaviour
     public Toggle toggleAllUI;
     public Image allPanel;
     public TextMeshProUGUI GenerationCount;
+    public TextMeshProUGUI BestFitness;
+    public TextMeshProUGUI BestStats;
     
    // bool spawnPopupUI = true;
     public void changeSimulationSpeed()

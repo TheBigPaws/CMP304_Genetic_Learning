@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
 public class ApplicationDataScript : MonoBehaviour
 {
     public float ElapsedTime = 0f;
@@ -15,7 +16,8 @@ public class ApplicationDataScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        for(int i = 0; i < BestGenerationStore; i++) {
+        for (int i = 0; i < BestGenerationStore; i++)
+        {
             HelperFunctions.HumanGroupAttributes temp = new HelperFunctions.HumanGroupAttributes();
             temp.setup();
             bestGenerations.Add(temp);
@@ -23,7 +25,7 @@ public class ApplicationDataScript : MonoBehaviour
 
         generation = 1;
     }
-    
+
     // Update is called once per frame
     void Update()
     {
@@ -51,31 +53,36 @@ public class ApplicationDataScript : MonoBehaviour
 
             switch (generation)
             {
-                case 3:
+                case 2:
                     RandomGenerationsAmount = 7;
                     break;
-                case 6:
+                case 4:
                     RandomGenerationsAmount = 5;
                     break;
-                case 9:
+                case 7:
                     RandomGenerationsAmount = 2;
                     break;
 
             }
+        }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            Application.LoadLevel(Application.loadedLevel);
+            Time.timeScale = 1;
         }
 
     }
     public void evaluateGenerations()
     {
 
-        
+
 
         foreach (HomeScript child in FindObjectsOfType<HomeScript>())
         {
             child.groupAttributes.CalculateGroupFitness();
             for (int i = 0; i < BestGenerationStore; i++)
             {
-        
+
                 if (bestGenerations[i].GroupFitness < child.groupAttributes.GroupFitness)
                 {
 
@@ -94,23 +101,22 @@ public class ApplicationDataScript : MonoBehaviour
             }
         }
 
-        Debug.Log("Best group fitnesses AFTER EVALUATE were");
-        for (int i = 0; i < BestGenerationStore; i++)
-        {
-        
-            Debug.Log(bestGenerations[i].GroupFitness);
-            //Debug.Log("humanCount is " + bestGenerations[i].humans.Count.ToString());
-        }
+        //Debug.Log("Best group fitnesses AFTER EVALUATE were");
+        //for (int i = 0; i < BestGenerationStore; i++)
+        //{
+        //
+        //    Debug.Log(bestGenerations[i].GroupFitness);
+        //}
     }
     public void startNextGeneration()
     {
-        
+
 
         //compare fitnesses of simulations
         evaluateGenerations();
 
 
-  
+
 
         int randGenCount = 0;
         foreach (HomeScript child in FindObjectsOfType<HomeScript>())
@@ -128,7 +134,7 @@ public class ApplicationDataScript : MonoBehaviour
                 int genAidx = 0;
                 int genBidx = 0;
 
-                while(genAidx == genBidx)
+                while (genAidx == genBidx)
                 {
                     genAidx = Random.Range(0, bestGenerations.Count);
                     genBidx = Random.Range(0, bestGenerations.Count);
@@ -146,6 +152,27 @@ public class ApplicationDataScript : MonoBehaviour
 
 
         }
+
+
+        //ui tings
+        int wolvesKilled = 0;
+        float foodGathered = 0;
+        float AverageLifeSpan = 0;
+
+        for (int l = 0; l < bestGenerations[0].humans.Count; l++)
+        {
+            wolvesKilled += bestGenerations[0].humans[l].wolvesKilled;
+            foodGathered += bestGenerations[0].humans[l].foodGathered;
+            AverageLifeSpan += bestGenerations[0].humans[l].timeSurvived;
+        }
+
+        AverageLifeSpan /= bestGenerations[0].humans.Count;
+
+        FindObjectOfType<UI_script>().BestFitness.text = ("#1 Generation Fitness: " + bestGenerations[0].GroupFitness);
+        FindObjectOfType<UI_script>().BestStats.text = ("Wolves killed: " + wolvesKilled.ToString() + "\nFood gathered: " + foodGathered.ToString() + "\nAverage life span: " + AverageLifeSpan.ToString());
+
+        HelperFunctions.RecordText(bestGenerations[0].GroupFitness.ToString());
+        
 
     }
 }
