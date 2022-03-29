@@ -9,6 +9,8 @@ public class ApplicationDataScript : MonoBehaviour
     public int generation;
     public GameObject popT;
 
+    int simNR = 0;
+
     public int RandomGenerationsAmount = 10;
     public int BestGenerationStore = 5;
     public int BestHumanStore = 5;
@@ -38,7 +40,7 @@ public class ApplicationDataScript : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         ElapsedTime += Time.deltaTime;
 
@@ -58,10 +60,13 @@ public class ApplicationDataScript : MonoBehaviour
         //evaluate generations and start new one
         if (allFinished)
         {
+            
+
+            if(generation == 15) { resetSim();return; }
+
+            startNextGeneration();
             generation++;
             FindObjectOfType<UI_script>().GenerationCount.text = "Generation " + generation.ToString();
-            startNextGeneration();
-
             switch (generation)
             {
                 case 2:
@@ -75,18 +80,19 @@ public class ApplicationDataScript : MonoBehaviour
                     break;
 
             }
+
         }
         if (Input.GetKeyDown(KeyCode.R))
         {
-            SceneManager.LoadScene("MainScene");
+            resetSim();
             Time.timeScale = 1;
         }
-            
+
     }
     public void evaluateGenerations()
     {
 
-
+        //HelperFunctions.RecordText("---- sim "+simNR.ToString()+"-----------GENERATION " + generation.ToString());
 
         foreach (HomeScript child in FindObjectsOfType<HomeScript>())
         {
@@ -112,7 +118,7 @@ public class ApplicationDataScript : MonoBehaviour
                     }
                 }
 
-                
+
             }
 
 
@@ -122,7 +128,6 @@ public class ApplicationDataScript : MonoBehaviour
                 if (bestGenerations[i].GroupFitness < child.groupAttributes.GroupFitness)
                 {
 
-                    //Debug.Log("replacing generation rank " + (i + 1).ToString() + "with fitness " + bestGenerations[i].GroupFitness.ToString() + "with fitness " + child.groupAttributes.GroupFitness.ToString());
 
                     //shift everything to the right 
                     for (int j = BestGenerationStore - 1; j > i; j--)
@@ -137,19 +142,27 @@ public class ApplicationDataScript : MonoBehaviour
             }
         }
 
-        //Debug.Log("Best group fitnesses AFTER EVALUATE were");
-        //for (int i = 0; i < BestGenerationStore; i++)
-        //{
-        //
-        //    Debug.Log(bestGenerations[i].GroupFitness);
-        //}
+        string outputTXT = "";
+        string bestHTXT = "";
 
-        Debug.Log("Best human fitnesses were");
-        for (int i = 0; i < BestHumanStore; i++)
+        //Debug.Log("Best group fitnesses AFTER EVALUATE were");
+        for (int i = 0; i < 5; i++)
         {
 
-            Debug.Log(bestHumans[i].individualFitness);
+            outputTXT += bestGenerations[i].GroupFitness.ToString() + " ";
+            bestHTXT += bestHumans[i].individualFitness.ToString()+" ";
+
         }
+        
+        outputTXT += bestHTXT;
+
+        HelperFunctions.RecordText(outputTXT);
+        //Debug.Log("Best human fitnesses were");
+        //for (int i = 0; i < BestHumanStore; i++)
+        //{
+        //
+        //    Debug.Log(bestHumans[i].individualFitness);
+        //}
     }
     public void startNextGeneration()
     {
@@ -165,43 +178,41 @@ public class ApplicationDataScript : MonoBehaviour
         foreach (HomeScript child in FindObjectsOfType<HomeScript>())
         {
             child.resetSim();
-
-            switch (randGenCount)
+            if (randGenCount < RandomGenerationsAmount)
             {
-                case 0:
-                    HelperFunctions.HumanGroupAttributes superGen = new HelperFunctions.HumanGroupAttributes();
-                    superGen.humans = bestHumans;
-
-                    //HelperFunctions.HumanGroupAttributes temp = HelperFunctions.CombineGenerations(bestGenerations[genAidx], bestGenerations[genBidx]);
-
-                    superGen.shiftAttributes();
-
-                    child.humanManager.startNextGeneration(superGen);
-                    child.runningOutline.GetComponent<SpriteRenderer>().color = Color.blue;
-                    break;
-
-                case int n when (n >= 1 && n<=10):
-                    int genAidx = 0;
-                    int genBidx = 0;
-
-                    while (genAidx == genBidx)
-                    {
-                        genAidx = Random.Range(0, bestGenerations.Count);
-                        genBidx = Random.Range(0, bestGenerations.Count);
-                    }
-
-                    HelperFunctions.HumanGroupAttributes temp = HelperFunctions.CombineGenerations(bestGenerations[genAidx], bestGenerations[genBidx]);
-
-                    temp.shiftAttributes();
-
-                        child.humanManager.startNextGeneration(temp);
-                        break;
-
-                    case int n when (n >= 11 && n <= 14):
-                        child.humanManager.spawnRandomHumans();
-                        child.runningOutline.GetComponent<SpriteRenderer>().color = Color.yellow;
-                        break;
+                child.humanManager.spawnRandomHumans();
+                child.runningOutline.GetComponent<SpriteRenderer>().color = Color.yellow;
             }
+            else if(randGenCount != 14)
+            {
+
+                int genAidx = 0;
+                int genBidx = 0;
+
+                while (genAidx == genBidx)
+                {
+                    genAidx = Random.Range(0, bestGenerations.Count);
+                    genBidx = Random.Range(0, bestGenerations.Count);
+                }
+
+                HelperFunctions.HumanGroupAttributes temp = HelperFunctions.CombineGenerations(bestGenerations[genAidx], bestGenerations[genBidx]);
+
+                temp.shiftAttributes();
+
+                child.humanManager.startNextGeneration(temp);
+            }
+
+            if (randGenCount == 14 && FindObjectOfType<UI_script>().allowSuperGen.isOn)
+            {
+                HelperFunctions.HumanGroupAttributes superGen = new HelperFunctions.HumanGroupAttributes();
+                superGen.humans = bestHumans;
+                superGen.shiftAttributes();
+
+                child.humanManager.startNextGeneration(superGen);
+                child.runningOutline.GetComponent<SpriteRenderer>().color = Color.blue;
+            }
+
+
             randGenCount++;
 
 
@@ -225,8 +236,46 @@ public class ApplicationDataScript : MonoBehaviour
         FindObjectOfType<UI_script>().BestFitness.text = ("#1 Generation Fitness: " + bestGenerations[0].GroupFitness);
         FindObjectOfType<UI_script>().BestStats.text = ("Wolves killed: " + wolvesKilled.ToString() + "\nFood gathered: " + foodGathered.ToString() + "\nAverage life span: " + AverageLifeSpan.ToString());
 
-        HelperFunctions.RecordText(bestGenerations[0].GroupFitness.ToString());
-        
+        //HelperFunctions.RecordText(bestGenerations[0].GroupFitness.ToString());
+
 
     }
+
+    private void resetSim()
+    {
+        simNR++;
+
+        ElapsedTime = 0f;
+        generation = 1;
+
+        bestGenerations.Clear();
+        bestHumans.Clear();
+        for (int i = 0; i < BestGenerationStore; i++)
+        {
+            HelperFunctions.HumanGroupAttributes temp = new HelperFunctions.HumanGroupAttributes();
+            temp.setup();
+            bestGenerations.Add(temp);
+        }
+
+        for (int i = 0; i < BestHumanStore; i++)
+        {
+            HelperFunctions.humanAttributes temp_h = new HelperFunctions.humanAttributes();
+            temp_h.individualFitness = 0;
+            bestHumans.Add(temp_h);
+        }
+
+        foreach (HomeScript child in FindObjectsOfType<HomeScript>())
+        {
+            child.resetSim();
+            child.humanManager.spawnRandomHumans();
+        }
+
+        FindObjectOfType<UI_script>().BestFitness.text = ("#1 Generation Fitness: " + bestGenerations[0].GroupFitness);
+        FindObjectOfType<UI_script>().BestStats.text = ("Wolves killed: \nFood gathered: \nAverage life span: ");
+        FindObjectOfType<UI_script>().GenerationCount.text = "Generation " + generation.ToString();
+
+        HelperFunctions.RecordText("banana");
+    }
 }
+
+

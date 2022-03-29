@@ -328,7 +328,7 @@ public class HumanScript : MonoBehaviour
 
 
         //whenever not fighting or fleeing
-        if (currentState != CurrentState.fighting && currentState != CurrentState.fleeing)
+        if (currentState != CurrentState.fleeing)
         {
             //if there's any food at home
             if (this.GetComponentInParent<HumanManager>().Home.storedFood > 0)
@@ -336,8 +336,15 @@ public class HumanScript : MonoBehaviour
                 //check if hungry/hurt enough to go eat
                 if (health/maxHealth < attributes.eatingTriggerHealthPerc || hunger/stomachSize < attributes.eatingTriggerHungerPerc)
                 {
-                    currentState = CurrentState.eating;
-                    targetObject = this.GetComponentInParent<HumanManager>().Home.gameObject;
+                    if(currentState == CurrentState.fighting)
+                    {
+                        currentState = CurrentState.fleeing;
+                    }
+                    else
+                    {
+                        currentState = CurrentState.eating;
+                        targetObject = this.GetComponentInParent<HumanManager>().Home.gameObject;
+                    }
                 }
             }
         }

@@ -9,10 +9,12 @@ public class UI_script : MonoBehaviour
     public Slider sliderRef;
     public Toggle spawnPopupUI;
     public Toggle toggleAllUI;
+    public Toggle allowSuperGen;
     public Image allPanel;
     public TextMeshProUGUI GenerationCount;
     public TextMeshProUGUI BestFitness;
     public TextMeshProUGUI BestStats;
+    public Dropdown combType;
     
    // bool spawnPopupUI = true;
     public void changeSimulationSpeed()

@@ -33,10 +33,10 @@ public static class HelperFunctions
 
 
         //if at the object, return true
-        if (Vector3.Distance(subject.transform.position,targetObject.transform.position)< 0.2f)
+        if (Vector3.Distance(subject.transform.position, targetObject.transform.position) < 0.2f)
         {
             return true;
-            
+
         }
         else
         {
@@ -61,11 +61,11 @@ public static class HelperFunctions
         public float CalculateGroupFitness()
         {
             GroupFitness = 0;
-            foreach(HelperFunctions.humanAttributes child in humans)
+            foreach (HelperFunctions.humanAttributes child in humans)
             {
                 GroupFitness += child.individualFitness;
                 //if (child.alive) { Gfitness += 300; }
-            
+
             }
             //groupFitness = Gfitness;
             return GroupFitness;
@@ -74,6 +74,7 @@ public static class HelperFunctions
         {
             GroupFitness = 0;
             humans = new List<humanAttributes>();
+            humans.Clear();
         }
         public void addHuman(HelperFunctions.humanAttributes attributes)
         {
@@ -97,7 +98,7 @@ public static class HelperFunctions
         public bool alive;
 
         public int ID;
-        
+
         //perk point attributes
         public int healthPP;
         public int attackPP;
@@ -119,18 +120,18 @@ public static class HelperFunctions
 
         public void calculateFitness()
         {
-            individualFitness = timeSurvived * 10 + wolvesKilled * 50 + foodGathered*2;
+            individualFitness = timeSurvived * 10 + wolvesKilled * 50 + foodGathered * 2;
             //individualFitness = wolvesKilled;
         }
 
         public void resetData()
         {
-        alive = true;
+            alive = true;
 
-        individualFitness = 0;
-        timeSurvived = 0;
-        foodGathered = 0;
-        wolvesKilled = 0;
+            individualFitness = 0;
+            timeSurvived = 0;
+            foodGathered = 0;
+            wolvesKilled = 0;
         }
 
         public void shuffleAttributes()
@@ -139,12 +140,12 @@ public static class HelperFunctions
             eatingTriggerHealthPerc += Random.Range(-eatingTriggerHealthPerc, 1.0f - eatingTriggerHealthPerc) / 2;
             eatingTriggerHungerPerc += Random.Range(-eatingTriggerHungerPerc, 1.0f - eatingTriggerHungerPerc) / 2;
 
-            huntChance += Random.Range(-huntChance, 1.0f- huntChance)/2;
-            fleeChance += Random.Range(-fleeChance, 1.0f- fleeChance)/2;
+            huntChance += Random.Range(-huntChance, 1.0f - huntChance) / 2;
+            fleeChance += Random.Range(-fleeChance, 1.0f - fleeChance) / 2;
 
             int respendPP = 0;
             //shuffle attributePoints
-            if(healthPP > 5)
+            if (healthPP > 5)
             {
                 healthPP -= 5;
                 respendPP += 5;
@@ -218,7 +219,7 @@ public static class HelperFunctions
             stomachSizePP = 5;
 
             spendPoints(perkPoints);
-      
+
 
             //set random triggers for eating
             eatingTriggerHealthPerc = Random.Range(0.0f, 1.0f);
@@ -229,63 +230,107 @@ public static class HelperFunctions
             fleeChance = Random.Range(0.0f, 1.0f);
         }
 
-        
+
     }
 
     public static HumanGroupAttributes CombineGenerations(HumanGroupAttributes GenerationA, HumanGroupAttributes GenerationB)
     {
         HumanGroupAttributes temp = GenerationA;
-        //random replace random amount
-        int to_replace = Random.Range(0,GenerationA.humans.Count);
-        for(int i = 0; i < to_replace; i++)
+
+        //Debug.Log("GEN A before combine");
+        //for (int i = 0; i < GenerationA.humans.Count; i++)
+        //{
+        //    Debug.Log(GenerationA.humans[i].individualFitness.ToString());
+        //}
+        //
+        //Debug.Log("GEN BB before combine");
+        //for (int i = 0; i < GenerationB.humans.Count; i++)
+        //{
+        //    Debug.Log(GenerationB.humans[i].individualFitness.ToString());
+        //}
+
+        switch (GameObject.FindObjectOfType<UI_script>().combType.value)
         {
-            //randomly get some of their humans
-            temp.humans[Random.Range(0, temp.humans.Count)] = GenerationB.humans[Random.Range(0, GenerationB.humans.Count)];
-        
+            case 0:
+                int to_replace = Random.Range(0, GenerationA.humans.Count);
+                for (int i = 0; i < to_replace; i++)
+                {
+                    //randomly get some of their humans
+                    temp.humans[Random.Range(0, temp.humans.Count)] = GenerationB.humans[Random.Range(0, GenerationB.humans.Count)];
+
+                }
+                break;
+
+            case 1:
+                //find idx of highest fitn in genB
+                float highestFitness = 0;
+                int highestIdx = 0;
+                for (int j = 0; j < GenerationB.humans.Count; j++)
+                {
+                    if (GenerationB.humans[j].individualFitness > highestFitness)
+                    {
+                        highestIdx = j;
+                        highestFitness = GenerationB.humans[j].individualFitness;
+                    }
+                }
+
+                //find idx of lowest fitn in genA
+                float lowestFitness_ = 100000;
+                int lowestIdx_ = 0;
+                for (int j = 0; j < temp.humans.Count; j++)
+                {
+                    if (temp.humans[j].individualFitness < lowestFitness_)
+                    {
+                        lowestIdx_ = j;
+                        lowestFitness_ = temp.humans[j].individualFitness;
+                    }
+
+                }
+
+
+                temp.humans[lowestIdx_] = GenerationB.humans[highestIdx];
+                break;
+
+            case 2:
+
+                int to_replace_ = Random.Range(0, GenerationA.humans.Count);
+                for (int i = 0; i < to_replace_; i++)
+                {
+
+                    float lowestFitness = 100000;
+                    int lowestIdx = 0;
+                    for (int j = 0; j < temp.humans.Count; j++)
+                    {
+                        if (temp.humans[j].individualFitness < lowestFitness)
+                        {
+                            lowestIdx = j;
+                            lowestFitness = temp.humans[j].individualFitness;
+                        }
+                    }
+
+                    temp.humans[lowestIdx] = GenerationB.humans[Random.Range(0, GenerationB.humans.Count)];
+                }
+
+                break;
         }
 
-        //int to_replace = Random.Range(0,GenerationA.humans.Count;
-        //int to_replace = 1;
-        //for (int i = 0; i < to_replace; i++)
+        //Debug.Log("GEN A after combine");
+        //for (int i = 0; i < GenerationA.humans.Count; i++)
         //{
-        //    float lowestFitness = 100000;
-        //    int lowestIdx = 0;
-        //    for(int j = 0; j < temp.humans.Count; j++)
-        //    {
-        //        if(temp.humans[j].individualFitness < lowestFitness)
-        //        {
-        //            lowestIdx = j;
-        //            lowestFitness = temp.humans[j].individualFitness;
-        //        }
-        //    }
-        //
-        //    float highestFitness = 0;
-        //    int highestIdx = 0;
-        //    for (int j = 0; j < GenerationB.humans.Count; j++)
-        //    {
-        //        if (GenerationB.humans[j].individualFitness > highestFitness)
-        //        {
-        //            highestIdx = j;
-        //            highestFitness = GenerationB.humans[j].individualFitness;
-        //        }
-        //    }
-        //
-        //    //worst gets replaced by a random from
-        //    temp.humans[lowestIdx] = GenerationB.humans[Random.Range(0, GenerationB.humans.Count)];
-        //
+        //    Debug.Log(GenerationA.humans[i].individualFitness.ToString());
         //}
+
 
         return temp;
     }
 
     public static void RecordText(string text)
     {
-
-        StreamWriter file = new StreamWriter("BestFitnesses.txt", true);
+        StreamWriter file = new StreamWriter(GameObject.FindObjectOfType<UI_script>().combType.options[GameObject.FindObjectOfType<UI_script>().combType.value].text+".txt", true);
         file.WriteLineAsync(text);
         file.Close();
 
-        
+
     }
 
 }
