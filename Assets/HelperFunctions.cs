@@ -79,7 +79,7 @@ public static class HelperFunctions
         {
 
             HelperFunctions.humanAttributes temp = attributes;
-            humans.Add(attributes);
+            humans.Add(temp);
             //humans.pu
         }
         public void shiftAttributes()
@@ -235,45 +235,45 @@ public static class HelperFunctions
     public static HumanGroupAttributes CombineGenerations(HumanGroupAttributes GenerationA, HumanGroupAttributes GenerationB)
     {
         HumanGroupAttributes temp = GenerationA;
-        ////random replace random amount
-        //int to_replace = Random.Range(0,GenerationA.humans.Count;
-        //for(int i = 0; i < to_replace; i++)
-        //{
-        //    //randomly get some of their humans
-        //    temp.humans[Random.Range(0, temp.humans.Count)] = GenerationB.humans[Random.Range(0, GenerationB.humans.Count)];
-        //
-        //}
-
-        //int to_replace = Random.Range(0,GenerationA.humans.Count;
-        int to_replace = 1;
-        for (int i = 0; i < to_replace; i++)
+        //random replace random amount
+        int to_replace = Random.Range(0,GenerationA.humans.Count);
+        for(int i = 0; i < to_replace; i++)
         {
-            float lowestFitness = 100000;
-            int lowestIdx = 0;
-            for(int j = 0; j < temp.humans.Count; j++)
-            {
-                if(temp.humans[j].individualFitness < lowestFitness)
-                {
-                    lowestIdx = j;
-                    lowestFitness = temp.humans[j].individualFitness;
-                }
-            }
-
-            float highestFitness = 0;
-            int highestIdx = 0;
-            for (int j = 0; j < GenerationB.humans.Count; j++)
-            {
-                if (GenerationB.humans[j].individualFitness > highestFitness)
-                {
-                    highestIdx = j;
-                    highestFitness = GenerationB.humans[j].individualFitness;
-                }
-            }
-
-            //worst gets replaced by a random from
-            temp.humans[lowestIdx] = GenerationB.humans[Random.Range(0, GenerationB.humans.Count)];
+            //randomly get some of their humans
+            temp.humans[Random.Range(0, temp.humans.Count)] = GenerationB.humans[Random.Range(0, GenerationB.humans.Count)];
         
         }
+
+        //int to_replace = Random.Range(0,GenerationA.humans.Count;
+        //int to_replace = 1;
+        //for (int i = 0; i < to_replace; i++)
+        //{
+        //    float lowestFitness = 100000;
+        //    int lowestIdx = 0;
+        //    for(int j = 0; j < temp.humans.Count; j++)
+        //    {
+        //        if(temp.humans[j].individualFitness < lowestFitness)
+        //        {
+        //            lowestIdx = j;
+        //            lowestFitness = temp.humans[j].individualFitness;
+        //        }
+        //    }
+        //
+        //    float highestFitness = 0;
+        //    int highestIdx = 0;
+        //    for (int j = 0; j < GenerationB.humans.Count; j++)
+        //    {
+        //        if (GenerationB.humans[j].individualFitness > highestFitness)
+        //        {
+        //            highestIdx = j;
+        //            highestFitness = GenerationB.humans[j].individualFitness;
+        //        }
+        //    }
+        //
+        //    //worst gets replaced by a random from
+        //    temp.humans[lowestIdx] = GenerationB.humans[Random.Range(0, GenerationB.humans.Count)];
+        //
+        //}
 
         return temp;
     }
@@ -284,6 +284,8 @@ public static class HelperFunctions
         StreamWriter file = new StreamWriter("BestFitnesses.txt", true);
         file.WriteLineAsync(text);
         file.Close();
+
+        
     }
 
 }
