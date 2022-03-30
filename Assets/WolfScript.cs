@@ -106,13 +106,13 @@ public class WolfScript : MonoBehaviour
                         HelperFunctions.spawnText(transform.position, "-" + (targetObject.GetComponent<HumanScript>().attack + health).ToString(), IconType.heart);
 
                         targetObject.GetComponent<HumanScript>().currentState = CurrentState.idle;
-                        targetObject.GetComponent<HumanScript>().attributes.wolvesKilled += 1;
+                        //targetObject.GetComponent<HumanScript>().attributes.wolvesKilled += 1;
 
                         this.GetComponent<SpriteRenderer>().color = new Color(1.0f, 0.5f, 0.5f);
                         this.transform.name = "WolfCorpse";
                         //make this object into a food source
                         this.gameObject.AddComponent<FoodSource>();
-                        this.gameObject.GetComponent<FoodSource>().FoodAmount = 60;
+                        this.gameObject.GetComponent<FoodSource>().FoodAmount = 150;
 
                         this.GetComponentInParent<WolfManager>().spawnRandomLocWolf();
 

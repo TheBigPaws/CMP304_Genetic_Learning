@@ -95,5 +95,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 151ff37e1a0b0274aa5a2a4c4f9d70f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  FoodAmount: 20
+  FoodAmount: 70
   isBush: 1
+  numberT: {fileID: 0}

@@ -38,7 +38,7 @@ public class HumanScript : MonoBehaviour
         health = maxHealth;
         attack = attributes.attackPP * 5;
         moveSpeed = Mathf.Sqrt(attributes.moveSpeedPP);
-        carry = attributes.carryPP * 1;
+        carry = attributes.carryPP * 4;
         stomachSize = attributes.stomachSizePP * 3;
         hunger = stomachSize;
     }
@@ -88,13 +88,9 @@ public class HumanScript : MonoBehaviour
 
                 if (HelperFunctions.goToTargetObject(this.gameObject, targetObject, moveSpeed))
                 {
-                    float foodBeforeExtract = FoodInInventory;
 
                     //attempting extracting as much food as possible
                     FoodInInventory += targetObject.GetComponent<FoodSource>().extractFood(carry - FoodInInventory);
-
-                    //record food gathered
-                    attributes.foodGathered += FoodInInventory - foodBeforeExtract;
 
                     //inventory full
                     if (FoodInInventory >= carry)
@@ -115,13 +111,15 @@ public class HumanScript : MonoBehaviour
                 if (HelperFunctions.goToTargetObject(this.gameObject,targetObject,moveSpeed))
                 {
                     //store all my food
-                    //Debug.Log("stored food");
                     HelperFunctions.spawnText(targetObject.transform.position, "+" + FoodInInventory, IconType.food);
                     targetObject.GetComponent<HomeScript>().storedFood += FoodInInventory;
+                    
+                    //record food gathered
+                    attributes.foodGathered += FoodInInventory;
+                    
                     FoodInInventory = 0;
                     currentState = CurrentState.idle;
 
-                    //TODO UI display stored
                 }
                 break;
 
@@ -230,14 +228,15 @@ public class HumanScript : MonoBehaviour
                     if (targetObject.GetComponent<WolfScript>().health <= 0)
                     {
                         HelperFunctions.spawnText(transform.position, "-" + (attack + targetObject.GetComponent<WolfScript>().health).ToString(), IconType.heart);
-
+                        attributes.damageDealt += attack + targetObject.GetComponent<WolfScript>().health;
                         currentState = CurrentState.idle;
-                        attributes.wolvesKilled += 1;
+                        //attributes.wolvesKilled += 1;
 
                         targetObject.GetComponent<WolfScript>().WolfDeath();
                     }
                     else
                     {
+                        attributes.damageDealt += attack;
                         HelperFunctions.spawnText(transform.position, "-" + (attack).ToString(), IconType.heart);
                     }
                 }

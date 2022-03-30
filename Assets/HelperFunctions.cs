@@ -116,11 +116,14 @@ public static class HelperFunctions
         public float individualFitness;
         public float timeSurvived;
         public float foodGathered;
-        public int wolvesKilled;
+        public float damageDealt;
+        //public int wolvesKilled;
+
 
         public void calculateFitness()
         {
-            individualFitness = timeSurvived * 10 + wolvesKilled * 50 + foodGathered * 2;
+            individualFitness = timeSurvived + damageDealt + foodGathered * 2;
+            individualFitness /= 10;
             //individualFitness = wolvesKilled;
         }
 
@@ -131,17 +134,17 @@ public static class HelperFunctions
             individualFitness = 0;
             timeSurvived = 0;
             foodGathered = 0;
-            wolvesKilled = 0;
+            damageDealt = 0;
         }
 
         public void shuffleAttributes()
         {
             //randomly shuffle these chance attreibutes: find anywhere it can move and cut that in half
-            eatingTriggerHealthPerc += Random.Range(-eatingTriggerHealthPerc, 1.0f - eatingTriggerHealthPerc) / 2;
-            eatingTriggerHungerPerc += Random.Range(-eatingTriggerHungerPerc, 1.0f - eatingTriggerHungerPerc) / 2;
+            eatingTriggerHealthPerc += Random.Range(-eatingTriggerHealthPerc, 1.0f - eatingTriggerHealthPerc) / 3;
+            eatingTriggerHungerPerc += Random.Range(-eatingTriggerHungerPerc, 1.0f - eatingTriggerHungerPerc) / 3;
 
-            huntChance += Random.Range(-huntChance, 1.0f - huntChance) / 2;
-            fleeChance += Random.Range(-fleeChance, 1.0f - fleeChance) / 2;
+            huntChance += Random.Range(-huntChance, 1.0f - huntChance) / 3;
+            fleeChance += Random.Range(-fleeChance, 1.0f - fleeChance) / 3;
 
             int respendPP = 0;
             //shuffle attributePoints
@@ -331,6 +334,23 @@ public static class HelperFunctions
         file.Close();
 
 
+    }
+
+    public static void RecordHumanAtts(humanAttributes atts)
+    {
+
+        string recordSTR = "\nHuman Fitness: " + atts.individualFitness.ToString();
+        recordSTR += "\nTime Survived: " + atts.timeSurvived.ToString() +"s";
+        recordSTR += "\nDamage Dealt: " + atts.damageDealt.ToString();
+        recordSTR += "\nFood Gathered: " + atts.foodGathered.ToString();
+        recordSTR += "\n--ATTRIBUTES--: ";
+        recordSTR += "\nHealth: " + atts.healthPP.ToString();
+        recordSTR += "\nAttack: " + atts.attackPP.ToString();
+        recordSTR += "\nMove Speed: " + atts.moveSpeedPP.ToString();
+        recordSTR += "\nCarry: " + atts.carryPP.ToString();
+        recordSTR += "\nStomach Size: " + atts.stomachSizePP.ToString();
+
+        RecordText(recordSTR);
     }
 
 }

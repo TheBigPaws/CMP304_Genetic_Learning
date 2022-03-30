@@ -93,7 +93,7 @@ public class ApplicationDataScript : MonoBehaviour
     {
 
         //HelperFunctions.RecordText("---- sim "+simNR.ToString()+"-----------GENERATION " + generation.ToString());
-
+        
         foreach (HomeScript child in FindObjectsOfType<HomeScript>())
         {
             child.groupAttributes.CalculateGroupFitness();
@@ -195,6 +195,9 @@ public class ApplicationDataScript : MonoBehaviour
                     genBidx = Random.Range(0, bestGenerations.Count);
                 }
 
+                HelperFunctions.HumanGroupAttributes superGen_ = new HelperFunctions.HumanGroupAttributes();
+                superGen_.humans = bestHumans;
+
                 HelperFunctions.HumanGroupAttributes temp = HelperFunctions.CombineGenerations(bestGenerations[genAidx], bestGenerations[genBidx]);
 
                 temp.shiftAttributes();
@@ -220,21 +223,21 @@ public class ApplicationDataScript : MonoBehaviour
 
 
         //ui tings
-        int wolvesKilled = 0;
+        float damageDealt = 0;
         float foodGathered = 0;
         float AverageLifeSpan = 0;
 
         for (int l = 0; l < bestGenerations[0].humans.Count; l++)
         {
-            wolvesKilled += bestGenerations[0].humans[l].wolvesKilled;
+            damageDealt += bestGenerations[0].humans[l].damageDealt;
             foodGathered += bestGenerations[0].humans[l].foodGathered;
             AverageLifeSpan += bestGenerations[0].humans[l].timeSurvived;
         }
 
         AverageLifeSpan /= bestGenerations[0].humans.Count;
 
-        FindObjectOfType<UI_script>().BestFitness.text = ("#1 Generation Fitness: " + bestGenerations[0].GroupFitness);
-        FindObjectOfType<UI_script>().BestStats.text = ("Wolves killed: " + wolvesKilled.ToString() + "\nFood gathered: " + foodGathered.ToString() + "\nAverage life span: " + AverageLifeSpan.ToString());
+        FindObjectOfType<UI_script>().BestFitness.text = ("#1 Group Fitness: " + bestGenerations[0].GroupFitness);
+        FindObjectOfType<UI_script>().BestStats.text = ("Damage dealt: " + damageDealt.ToString() + "\nFood gathered: " + foodGathered.ToString() + "\nAverage life span: " + AverageLifeSpan.ToString());
 
         //HelperFunctions.RecordText(bestGenerations[0].GroupFitness.ToString());
 
@@ -243,6 +246,26 @@ public class ApplicationDataScript : MonoBehaviour
 
     private void resetSim()
     {
+
+
+        HelperFunctions.RecordText("******************END OF SIM******************\nBEST HUMANS WERE:");
+
+        for (int i = 0; i < bestHumans.Count; i++)
+        {
+            HelperFunctions.RecordHumanAtts(bestHumans[i]);
+        }
+
+        HelperFunctions.RecordText("\n Top human combinations were:");
+
+        for (int i = 0; i < bestGenerations.Count; i++)
+        {
+            HelperFunctions.RecordText("\nGeneration " + (i+1).ToString());
+
+            for (int j = 0; j < bestHumans.Count; j++)
+            {
+                HelperFunctions.RecordHumanAtts(bestGenerations[i].humans[j]);
+            }
+        }
         simNR++;
 
         ElapsedTime = 0f;
@@ -274,7 +297,7 @@ public class ApplicationDataScript : MonoBehaviour
         FindObjectOfType<UI_script>().BestStats.text = ("Wolves killed: \nFood gathered: \nAverage life span: ");
         FindObjectOfType<UI_script>().GenerationCount.text = "Generation " + generation.ToString();
 
-        HelperFunctions.RecordText("banana");
+        
     }
 }
 
