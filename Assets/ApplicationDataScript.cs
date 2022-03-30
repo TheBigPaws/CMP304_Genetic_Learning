@@ -60,9 +60,9 @@ public class ApplicationDataScript : MonoBehaviour
         //evaluate generations and start new one
         if (allFinished)
         {
-            
 
-            if(generation == 15) { resetSim();return; }
+
+           // if (generation == 15) { resetSim(); return; }
 
             startNextGeneration();
             generation++;
@@ -93,42 +93,53 @@ public class ApplicationDataScript : MonoBehaviour
     {
 
         //HelperFunctions.RecordText("---- sim "+simNR.ToString()+"-----------GENERATION " + generation.ToString());
-        
+
         foreach (HomeScript child in FindObjectsOfType<HomeScript>())
         {
             child.groupAttributes.CalculateGroupFitness();
             for (int l = 0; l < child.groupAttributes.humans.Count; l++)
             {
+
+                //IF THE HUMAN IN QUESTION IS UNIQUE,STORE IT
+
                 for (int i = 0; i < BestHumanStore; i++)
                 {
+
                     if (bestHumans[i].individualFitness < child.groupAttributes.humans[l].individualFitness)
                     {
 
                         //Debug.Log("replacing generation rank " + (i + 1).ToString() + "with fitness " + bestGenerations[i].GroupFitness.ToString() + "with fitness " + child.groupAttributes.GroupFitness.ToString());
 
-                        //shift everything to the right 
-                        for (int j = BestHumanStore - 1; j > i; j--)
+                        bool uniqueHuman = true;
+                        for (int m = 0; m < BestHumanStore; m++)
                         {
-                            bestHumans[j] = bestHumans[j - 1];
+                            if (bestHumans[m].getAttsAsString() == child.groupAttributes.humans[l].getAttsAsString())
+                            {
+                                uniqueHuman = false;
+
+                            }
                         }
 
-                        bestHumans[i] = child.groupAttributes.humans[l];
+                        if (uniqueHuman)
+                        {
+                            //shift everything to the right 
+                            for (int j = BestHumanStore - 1; j > i; j--)
+                            {
+                                bestHumans[j] = bestHumans[j - 1];
+                            }
 
-                        break;
+                            bestHumans[i] = child.groupAttributes.humans[l];
+
+                            break;
+                        }
                     }
                 }
-
-
             }
-
 
             for (int i = 0; i < BestGenerationStore; i++)
             {
-
                 if (bestGenerations[i].GroupFitness < child.groupAttributes.GroupFitness)
                 {
-
-
                     //shift everything to the right 
                     for (int j = BestGenerationStore - 1; j > i; j--)
                     {
@@ -150,10 +161,10 @@ public class ApplicationDataScript : MonoBehaviour
         {
 
             outputTXT += bestGenerations[i].GroupFitness.ToString() + " ";
-            bestHTXT += bestHumans[i].individualFitness.ToString()+" ";
+            bestHTXT += bestHumans[i].individualFitness.ToString() + " ";
 
         }
-        
+
         outputTXT += bestHTXT;
 
         HelperFunctions.RecordText(outputTXT);
@@ -183,7 +194,7 @@ public class ApplicationDataScript : MonoBehaviour
                 child.humanManager.spawnRandomHumans();
                 child.runningOutline.GetComponent<SpriteRenderer>().color = Color.yellow;
             }
-            else if(randGenCount != 14)
+            else if (randGenCount != 14)
             {
 
                 int genAidx = 0;
@@ -259,7 +270,7 @@ public class ApplicationDataScript : MonoBehaviour
 
         for (int i = 0; i < bestGenerations.Count; i++)
         {
-            HelperFunctions.RecordText("\nGeneration " + (i+1).ToString());
+            HelperFunctions.RecordText("\nGeneration " + (i + 1).ToString());
 
             for (int j = 0; j < bestHumans.Count; j++)
             {
@@ -297,7 +308,7 @@ public class ApplicationDataScript : MonoBehaviour
         FindObjectOfType<UI_script>().BestStats.text = ("Wolves killed: \nFood gathered: \nAverage life span: ");
         FindObjectOfType<UI_script>().GenerationCount.text = "Generation " + generation.ToString();
 
-        
+
     }
 }
 

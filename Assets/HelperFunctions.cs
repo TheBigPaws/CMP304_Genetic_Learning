@@ -119,6 +119,16 @@ public static class HelperFunctions
         public float damageDealt;
         //public int wolvesKilled;
 
+        public string getAttsAsString()
+        {
+            string retStr = "";
+            retStr += healthPP;
+            retStr += attackPP;
+            retStr += carryPP;
+            retStr += moveSpeedPP;
+            retStr += stomachSizePP;
+            return retStr;
+        }
 
         public void calculateFitness()
         {
@@ -349,7 +359,10 @@ public static class HelperFunctions
         recordSTR += "\nMove Speed: " + atts.moveSpeedPP.ToString();
         recordSTR += "\nCarry: " + atts.carryPP.ToString();
         recordSTR += "\nStomach Size: " + atts.stomachSizePP.ToString();
-
+        recordSTR += "\nchance(Hunt/Gather): (" + atts.huntChance.ToString() + "/"+ (1.0f - atts.huntChance).ToString() + ")";
+        recordSTR += "\nchance(Fight/Flee): (" + (1.0f-atts.fleeChance).ToString() + "/" + atts.fleeChance.ToString() + ")";
+        recordSTR += "\nHunger % Eat Trigger: " + atts.eatingTriggerHungerPerc.ToString();
+        recordSTR += "\nHealth % Eat Trigger: " + atts.eatingTriggerHealthPerc.ToString();
         RecordText(recordSTR);
     }
 
